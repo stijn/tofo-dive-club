@@ -2,6 +2,7 @@
 import { photos, srcset, unsplash, type Lang } from '../config';
 import { t } from '../i18n';
 import { pillarIcons, depths } from '../data';
+import { rich } from '../lib/rich';
 import SectionHead from './SectionHead.astro';
 import Fa from './Fa.astro';
 import Line from './Line.astro';
@@ -15,13 +16,13 @@ const beach = photos.tofoBeach;
 <section class="section club" id="club" data-depth={depths.club} aria-labelledby="club-title">
   <div class="container club-grid">
     <div>
-      <SectionHead id="club" depth={depths.club} kicker={d.kicker} title={d.title} lead={d.lead} />
+      <SectionHead lang={lang} id="club" depth={depths.club} kicker={d.kicker} title={d.title} lead={d.lead} />
       <ul class="pillars">
         {d.pillars.map((p) => (
           <li class="pillar reveal">
             <span class="pillar-icon"><Fa icon={pillarIcons[p.id]} /></span>
             <h3>{p.title}</h3>
-            <p>{p.text}</p>
+            <p set:html={rich(p.text, lang)} />
           </li>
         ))}
       </ul>
@@ -31,6 +32,8 @@ const beach = photos.tofoBeach;
       <figure class="photo photo-tall reveal">
         <img
           src={unsplash(diver.id, 800, 1.25)}
+          width="800"
+          height="1000"
           srcset={srcset(diver.id, [400, 600, 800, 1100], 1.25)}
           sizes="(min-width: 960px) 34vw, 90vw"
           alt={d.photoAlt}
@@ -41,6 +44,8 @@ const beach = photos.tofoBeach;
       <figure class="photo photo-wide reveal">
         <img
           src={unsplash(beach.id, 700, 0.7)}
+          width="700"
+          height="490"
           srcset={srcset(beach.id, [400, 700, 1000], 0.7)}
           sizes="(min-width: 960px) 22vw, 60vw"
           alt={d.beachAlt}

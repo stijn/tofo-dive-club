@@ -1,4 +1,5 @@
 ---
+import { getAbsoluteLocaleUrl } from 'astro:i18n';
 import Base from '../layouts/Base.astro';
 import Header from './Header.astro';
 import Hero from './Hero.astro';
@@ -6,29 +7,107 @@ import Club from './Club.astro';
 import Dives from './Dives.astro';
 import Sites from './Sites.astro';
 import Seasons from './Seasons.astro';
+import Offer from './Offer.astro';
 import Join from './Join.astro';
 import Faq from './Faq.astro';
+import Glossary from './Glossary.astro';
 import Footer from './Footer.astro';
 import Gauge from './Gauge.astro';
-import type { Lang } from '../config';
+import Smb from './Smb.astro';
+import { club, htmlLang, type Lang } from '../config';
+import { t } from '../i18n';
+import { plain } from '../lib/rich';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
+const d = t(lang);
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const site = Astro.site!.origin;
+const pageUrl = getAbsoluteLocaleUrl(lang, '');
+const homeEn = getAbsoluteLocaleUrl('en', '');
+
+// Structured data for search engines: the site, the club as a local sports club,
+// this page, and the FAQ.
+const sameAs = [club.instagram, club.facebook].filter(Boolean);
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': `${homeEn}#website`,
+      url: homeEn,
+      name: club.name.en,
+      alternateName: club.name.pt,
+      inLanguage: ['en', 'pt-MZ'],
+    },
+    {
+      '@type': 'SportsClub',
+      '@id': `${homeEn}#club`,
+      name: club.name[lang],
+      alternateName: club.name[lang === 'en' ? 'pt' : 'en'],
+      description: d.meta.description,
+      url: pageUrl,
+      logo: `${site}${base}/icon-512.png`,
+      image: `${site}${base}/og/og-${lang}.png`,
+      sport: 'Scuba diving',
+      knowsLanguage: ['en', 'pt'],
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: 'Praia do Tofo',
+        addressRegion: 'Inhambane',
+        addressCountry: 'MZ',
+      },
+      geo: { '@type': 'GeoCoordinates', latitude: -23.8525, longitude: 35.5465 },
+      hasMap: club.map,
+      areaServed: { '@type': 'Place', name: 'Tofo, Inhambane, Mozambique' },
+      founder: { '@type': 'Person', name: 'Isa' },
+      ...(club.email && { email: club.email }),
+      ...(club.whatsapp && { telephone: `+${club.whatsapp}` }),
+      ...(sameAs.length && { sameAs }),
+    },
+    {
+      '@type': 'WebPage',
+      '@id': `${pageUrl}#webpage`,
+      url: pageUrl,
+      name: d.meta.title,
+      description: d.meta.description,
+      inLanguage: htmlLang[lang],
+      isPartOf: { '@id': `${homeEn}#website` },
+      about: { '@id': `${homeEn}#club` },
+      primaryImageOfPage: `${site}${base}/og/og-${lang}.png`,
+    },
+    {
+      '@type': 'FAQPage',
+      '@id': `${pageUrl}#faq`,
+      inLanguage: htmlLang[lang],
+      mainEntity: d.faq.items.map((item) => ({
+        '@type': 'Question',
+        name: item.q,
+        acceptedAnswer: { '@type': 'Answer', text: plain(item.a) },
+      })),
+    },
+  ],
+};
 ---
-<Base lang={lang}>
+<Base lang={lang} preloadHero>
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   <Header lang={lang} />
   <Gauge lang={lang} />
-  <main id="main">
+  <main id="main" tabindex="-1">
     <Hero lang={lang} />
     <Club lang={lang} />
     <Dives lang={lang} />
     <Sites lang={lang} />
     <Seasons lang={lang} />
+    <Offer lang={lang} />
     <Join lang={lang} />
     <Faq lang={lang} />
+    <Glossary lang={lang} />
   </main>
   <Footer lang={lang} />
+  <Smb lang={lang} />
   <script>
     import '../scripts/motion';
+    import '../scripts/treats';
   </script>
 </Base>

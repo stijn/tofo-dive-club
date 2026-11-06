@@ -3,7 +3,8 @@
 import {
   faUserGroup, faShip, faGraduationCap, faHandHoldingHeart, faWater, faFish,
   faTemperatureHalf, faLanguage, faSun, faMoon, faUmbrellaBeach, faFishFins,
-  faMugHot, faPersonSwimming,
+  faMugHot, faPersonSwimming, faCalendarCheck, faCoins, faHandshakeAngle,
+  faLifeRing, faShieldHalved, faBinoculars,
 } from '@fortawesome/free-solid-svg-icons';
 import type { IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import type { PhotoKey } from './config';
@@ -51,11 +52,23 @@ export const maxDepth = 30;
 // 2 = best chances, 1 = possible, 0 = unlikely. January first.
 export const seasons = {
   sharks: [2, 2, 2, 1, 1, 1, 1, 1, 1, 2, 2, 2],
-  mantas: [2, 2, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2],
+  // Reef mantas off Tofo fell about 99% from 2003 to 2023 (Marine Megafauna Foundation),
+  // so no month gets 'best chances' any more.
+  mantas: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   whales: [0, 0, 0, 0, 0, 1, 2, 2, 1, 1, 1, 0],
 } as const;
 // Approximate sea temperature in °C.
 export const waterTemp = [27, 28, 27, 26, 25, 23, 22, 22, 22, 23, 25, 26];
 
 // Depth (metres) shown on the gauge for each section.
-export const depths = { hero: 0, club: 5, dives: 10, sites: 18, seasons: 24, join: 28, faq: 30 } as const;
+export const depths = { hero: 0, club: 5, dives: 10, sites: 16, seasons: 22, offer: 26, join: 28, faq: 30 } as const;
+
+// Icons for the offer's promises, keyed by id in the copy.
+export const promiseIcons: Record<string, IconDefinition> = {
+  go: faCalendarCheck,
+  credit: faHandshakeAngle,
+  price: faCoins,
+  skills: faLifeRing,
+  safety: faShieldHalved,
+  respect: faBinoculars,
+};

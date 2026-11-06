@@ -1,24 +1,21 @@
 // Scroll reveals and line-md replays. Everything degrades to static content
-// without JS, and reduced-motion visitors get final states straight away.
+// without JS, and with animations paused you get final states straight away.
+import { applyToIcons, motionOn } from './motion-state';
 
-const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const root = document.documentElement;
 const icons = [...document.querySelectorAll<SVGSVGElement>('svg[data-line-md]')];
 const reveals = [...document.querySelectorAll<HTMLElement>('.reveal')];
 
-if (reduce || !('IntersectionObserver' in window)) {
-  icons.forEach((svg) => {
-    // Jump past the draw-in animation and hold the final frame.
-    svg.setCurrentTime?.(10);
-    svg.pauseAnimations?.();
-  });
+if (!motionOn() || !('IntersectionObserver' in window)) {
+  applyToIcons();
 } else {
-  document.documentElement.classList.add('js-motion', 'motion-ready');
+  root.classList.add('motion-ready');
 
   // line-md icons draw themselves once on load; hold off until they're visible.
   const iconObserver = new IntersectionObserver(
     (entries) => {
       for (const entry of entries) {
-        if (!entry.isIntersecting) continue;
+        if (!entry.isIntersecting || !motionOn()) continue;
         const svg = entry.target as SVGSVGElement;
         svg.setCurrentTime?.(0);
         svg.unpauseAnimations?.();
@@ -28,7 +25,7 @@ if (reduce || !('IntersectionObserver' in window)) {
     { rootMargin: '0px 0px -10% 0px' },
   );
   icons.forEach((svg) => {
-    if (svg.closest('.menu-btn')) return;
+    if (svg.closest('.menu-btn, .motion-btn')) return;
     const r = svg.getBoundingClientRect();
     if (r.top < window.innerHeight && r.bottom > 0) return; // already on screen
     svg.pauseAnimations?.();
@@ -47,9 +44,16 @@ if (reduce || !('IntersectionObserver' in window)) {
     { rootMargin: '0px 0px -8% 0px', threshold: 0.05 },
   );
   reveals.forEach((el) => {
-    // Stagger siblings a little.
     const index = [...(el.parentElement?.children ?? [])].indexOf(el);
     el.style.setProperty('--delay', `${Math.min(index, 5) * 70}ms`);
     revealObserver.observe(el);
   });
 }
+
+// Turning animations back on later must not hide content that was already read.
+document.addEventListener('tdc:motion', (e) => {
+  if ((e as CustomEvent<boolean>).detail) {
+    root.classList.add('motion-ready');
+    reveals.forEach((el) => el.classList.add('is-in'));
+  }
+});

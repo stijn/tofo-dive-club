@@ -1,7 +1,7 @@
 {
   "name": "tofo-dive-club",
   "type": "module",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "MVP website for a community dive club in Tofo, Mozambique. English and Portuguese.",
   "engines": {
@@ -11,7 +11,9 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "check": "astro check"
+    "check": "astro check",
+    "audit": "node tools/a11y/axe.mjs node_modules/axe-core/axe.min.js 1280 http://localhost:4321/tofo-dive-club/ http://localhost:4321/tofo-dive-club/pt/ http://localhost:4321/tofo-dive-club/404.html && node tools/a11y/axe.mjs node_modules/axe-core/axe.min.js 375 http://localhost:4321/tofo-dive-club/ http://localhost:4321/tofo-dive-club/pt/",
+    "audit:targets": "node tools/a11y/targets.mjs 1280 http://localhost:4321/tofo-dive-club/ http://localhost:4321/tofo-dive-club/pt/ && node tools/a11y/targets.mjs 375 http://localhost:4321/tofo-dive-club/ http://localhost:4321/tofo-dive-club/pt/"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",
@@ -26,6 +28,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.12",
+    "axe-core": "^4.14.0",
     "typescript": "^6.0.3"
   }
 }

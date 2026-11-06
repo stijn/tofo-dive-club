@@ -1,0 +1,91 @@
+---
+// Back to top, dive style. Floating button for pointer users; the footer
+// link does the same for keyboard users. Both run the same ascent.
+import type { Lang } from '../config';
+import { t } from '../i18n';
+import SmbIcon from './SmbIcon.astro';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = t(lang).smb;
+---
+<a class="smb-float" href="#top" title={d.hint} data-ascend>
+  <span class="visually-hidden">{d.label}</span>
+  <SmbIcon />
+</a>
+<div class="safety-stop" aria-hidden="true" data-safety-stop>
+  <span>{d.stop}</span>
+  <strong data-safety-count>3:00</strong>
+</div>
+<div class="toast" role="status" data-toast data-message={d.toast}>
+  <p data-toast-text></p>
+  <button class="icon-btn toast-close" type="button" data-toast-close>
+    <span aria-hidden="true">×</span>
+    <span class="visually-hidden">{d.close}</span>
+  </button>
+</div>
+
+<script>
+  import { motionOn } from '../scripts/motion-state';
+
+  const float = document.querySelector<HTMLAnchorElement>('.smb-float')!;
+  const stop = document.querySelector<HTMLElement>('[data-safety-stop]')!;
+  const count = document.querySelector<HTMLElement>('[data-safety-count]')!;
+  const root = document.documentElement;
+  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+  const onScroll = () => float.classList.toggle('is-visible', window.scrollY > window.innerHeight * 1.2);
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  const arrive = (y: number) =>
+    new Promise<void>((resolve) => {
+      const start = performance.now();
+      const check = () => {
+        if (Math.abs(window.scrollY - y) < 2 || performance.now() - start > 2500) resolve();
+        else requestAnimationFrame(check);
+      };
+      check();
+    });
+
+  const focusTop = () => {
+    const h1 = document.getElementById('hero-title') ?? document.querySelector('h1');
+    (h1 as HTMLElement | null)?.focus({ preventScroll: true });
+  };
+
+  let busy = false;
+  const ascend = async (e: Event) => {
+    e.preventDefault();
+    if (busy) return;
+    if (!motionOn()) {
+      window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+      focusTop();
+      return;
+    }
+    busy = true;
+    root.dataset.ascending = '1';
+    float.classList.add('is-launching');
+
+    // Safety stop at 5 m: the club section.
+    const club = document.getElementById('club');
+    const stopY = club ? Math.max(0, club.offsetTop - 80) : 0;
+    if (club && window.scrollY > stopY + window.innerHeight) {
+      window.scrollTo({ top: stopY, behavior: 'smooth' });
+      await arrive(stopY);
+      stop.classList.add('is-on');
+      for (const n of [3, 2, 1, 0]) {
+        count.textContent = `${n}:00`;
+        await sleep(280);
+      }
+      stop.classList.remove('is-on');
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    await arrive(0);
+    focusTop();
+    float.classList.remove('is-launching');
+    delete root.dataset.ascending;
+    busy = false;
+  };
+
+  document.querySelectorAll<HTMLAnchorElement>('[data-ascend]').forEach((a) => a.addEventListener('click', ascend));
+</script>

@@ -1,11 +1,19 @@
 ---
 // Section heading with its "depth stop" label, e.g. "10 m · Dives".
-interface Props { depth: number; kicker: string; title: string; lead?: string; id: string }
-const { depth, kicker, title, lead, id } = Astro.props;
+import type { Lang } from '../config';
+import { t } from '../i18n';
+import { rich } from '../lib/rich';
+
+interface Props { depth: number; kicker: string; title: string; lead?: string; id: string; lang: Lang }
+const { depth, kicker, title, lead, id, lang } = Astro.props;
+const metres = t(lang).glossary.abbreviations.find((a) => a.id === 'm')!.title;
 ---
 <header class="section-head">
-  <p class="kicker reveal"><span class="kicker-depth">{String(depth).padStart(2, '0')} m</span>{kicker}</p>
+  <p class="kicker reveal">
+    <span class="kicker-depth">{String(depth).padStart(2, '0')} <abbr title={metres}>m</abbr></span>
+    <span>{kicker}</span>
+  </p>
   <h2 class="reveal" id={`${id}-title`}>{title}</h2>
-  {lead && <p class="lead reveal">{lead}</p>}
+  {lead && <p class="lead reveal" set:html={rich(lead, lang)} />}
   <slot />
 </header>

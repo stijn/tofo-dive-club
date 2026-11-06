@@ -1,6 +1,7 @@
 ---
 import type { Lang } from '../config';
 import { t } from '../i18n';
+import { rich } from '../lib/rich';
 import { sites, maxDepth, depths } from '../data';
 import SectionHead from './SectionHead.astro';
 import Line from './Line.astro';
@@ -9,14 +10,11 @@ interface Props { lang: Lang }
 const { lang } = Astro.props;
 const d = t(lang).sites;
 const ticks = [0, 10, 20, 30];
-const range = (id: string) => {
-  const [min, max] = sites[id].depth;
-  return min === 0 ? d.surface : `${min}–${max} m`;
-};
 ---
 <section class="section sites deep" id="sites" data-depth={depths.sites} aria-labelledby="sites-title">
+  <div class="bubbles" aria-hidden="true"></div>
   <div class="container">
-    <SectionHead id="sites" depth={depths.sites} kicker={d.kicker} title={d.title} lead={d.lead} />
+    <SectionHead lang={lang} id="sites" depth={depths.sites} kicker={d.kicker} title={d.title} lead={d.lead} />
 
     <div class="profile">
       <div class="profile-axis" aria-hidden="true">
@@ -31,16 +29,19 @@ const range = (id: string) => {
               <div class="site-body">
                 <h3>{s.name}</h3>
                 <p class="site-meta">
-                  <span class="site-depth"><span class="visually-hidden">{d.depth}: </span>{range(s.id)}</span>
+                  <span class="site-depth">
+                    <span class="visually-hidden">{d.depth}: </span>
+                    {min === 0 ? d.surface : <>{min}–{max} <abbr title={d.metres}>m</abbr></>}
+                  </span>
                   <span class="tag">{d.levels[level]}</span>
                 </p>
-                <p>{s.text}</p>
+                <p set:html={rich(s.text, lang)} />
               </div>
             </li>
           );
         })}
       </ol>
     </div>
-    <p class="note reveal"><Line name="alert-circle" /> {d.note}</p>
+    <p class="note reveal"><Line name="alert-circle" /> <span set:html={rich(d.note, lang)} /></p>
   </div>
 </section>

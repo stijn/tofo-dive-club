@@ -1,0 +1,34 @@
+---
+// Glossary of dive jargon and short forms (WCAG 3.1.3 and 3.1.4).
+// Copy links its first use of a term here with [[g:id|text]].
+import type { Lang } from '../config';
+import { t } from '../i18n';
+import { depths } from '../data';
+import SectionHead from './SectionHead.astro';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const g = t(lang).glossary;
+---
+<section class="section glossary deep" id="glossary" data-depth={depths.faq} aria-labelledby="glossary-title">
+  <div class="container">
+    <SectionHead lang={lang} id="glossary" depth={depths.faq} kicker={g.kicker} title={g.title} lead={g.lead} />
+    <dl class="terms">
+      {g.terms.map((term) => (
+        <div class="term-row reveal" id={`g-${term.id}`} tabindex="-1">
+          <dt>{term.term}</dt>
+          <dd>{term.def}</dd>
+        </div>
+      ))}
+    </dl>
+    <h3 class="abbr-title reveal">{g.abbrTitle}</h3>
+    <dl class="abbrs reveal">
+      {g.abbreviations.map((a) => (
+        <div>
+          <dt><abbr title={a.title}>{a.short}</abbr></dt>
+          <dd>{a.title}</dd>
+        </div>
+      ))}
+    </dl>
+  </div>
+</section>

@@ -8,7 +8,7 @@ interface Props { lang: Lang }
 const { lang } = Astro.props;
 const d = t(lang);
 ---
-<aside class="gauge is-surface" aria-hidden="true" data-gauge data-max={maxDepth}>
+<div class="gauge is-surface" aria-hidden="true" data-gauge data-max={maxDepth}>
   <span class="gauge-label">{d.gauge.label}</span>
   <span class="gauge-readout"><span data-gauge-value>0</span> m</span>
   <span class="gauge-track">
@@ -16,7 +16,7 @@ const d = t(lang);
     <span class="gauge-fill" data-gauge-fill></span>
     <span class="gauge-dot" data-gauge-dot></span>
   </span>
-</aside>
+</div>
 
 <script>
   const value = document.querySelector<HTMLElement>('[data-gauge-value]')!;

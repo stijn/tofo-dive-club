@@ -20,9 +20,10 @@ const strings = {
 };
 ---
 <section class="section join deep" id="join" data-depth={depths.join} aria-labelledby="join-title">
+  <div class="bubbles" aria-hidden="true"></div>
   <div class="container join-grid">
     <div>
-      <SectionHead id="join" depth={depths.join} kicker={d.kicker} title={d.title} lead={d.lead} />
+      <SectionHead lang={lang} id="join" depth={depths.join} kicker={d.kicker} title={d.title} lead={d.lead} />
       <ol class="steps">
         {d.steps.map((s, i) => (
           <li class="step reveal">
@@ -42,26 +43,32 @@ const strings = {
       data-whatsapp={club.whatsapp}
       data-email={club.email}
       data-strings={JSON.stringify(strings)}
+      aria-labelledby="join-title"
       novalidate
     >
       <div class="field">
-        <label for="f-name">{f.name}</label>
-        <input id="f-name" name="name" autocomplete="name" required />
+        <label for="f-name">{f.name} <span class="req">({f.required})</span></label>
+        <p class="hint" id="f-name-hint">{f.nameHint}</p>
+        <input id="f-name" name="name" autocomplete="given-name" required aria-required="true" aria-describedby="f-name-hint f-name-error" />
+        <p class="error" id="f-name-error" hidden><Line name="alert-circle" /> {f.nameError}</p>
       </div>
       <div class="field">
-        <label for="f-email">{f.email}</label>
-        <input id="f-email" name="email" type="email" autocomplete="email" />
+        <label for="f-email">{f.email} <span class="opt">({f.optional})</span></label>
+        <p class="hint" id="f-email-hint">{f.emailHint}</p>
+        <input id="f-email" name="email" type="email" autocomplete="email" aria-describedby="f-email-hint" />
       </div>
       <div class="field-row">
         <div class="field">
           <label for="f-cert">{f.cert}</label>
-          <select id="f-cert" name="cert">
+          <p class="hint" id="f-cert-hint">{f.certHint}</p>
+          <select id="f-cert" name="cert" aria-describedby="f-cert-hint">
             {f.certOptions.map((o) => <option>{o}</option>)}
           </select>
         </div>
         <div class="field">
           <label for="f-dives">{f.dives}</label>
-          <select id="f-dives" name="dives">
+          <p class="hint" id="f-dives-hint">{f.divesHint}</p>
+          <select id="f-dives" name="dives" aria-describedby="f-dives-hint">
             {f.diveOptions.map((o) => <option>{o}</option>)}
           </select>
         </div>
@@ -78,11 +85,12 @@ const strings = {
         </div>
       </fieldset>
       <div class="field" data-dates>
-        <label for="f-dates">{f.dates}</label>
-        <input id="f-dates" name="dates" placeholder={f.datesPlaceholder} />
+        <label for="f-dates">{f.dates} <span class="opt">({f.optional})</span></label>
+        <p class="hint" id="f-dates-hint">{f.datesHint}</p>
+        <input id="f-dates" name="dates" placeholder={f.datesPlaceholder} aria-describedby="f-dates-hint" />
       </div>
       <fieldset class="field">
-        <legend>{f.interests}</legend>
+        <legend>{f.interests} <span class="opt">({f.optional})</span></legend>
         <div class="chips">
           {f.interestOptions.map((o) => (
             <label class="chip">
@@ -93,21 +101,23 @@ const strings = {
         </div>
       </fieldset>
       <div class="field">
-        <label for="f-message">{f.message}</label>
-        <textarea id="f-message" name="message" rows="3" placeholder={f.messagePlaceholder}></textarea>
+        <label for="f-message">{f.message} <span class="opt">({f.optional})</span></label>
+        <p class="hint" id="f-message-hint">{f.messageHint}</p>
+        <textarea id="f-message" name="message" rows="3" aria-describedby="f-message-hint"></textarea>
       </div>
+      <p class="form-actions-hint" id="f-actions-hint"><Line name="alert-circle" /> {f.actionsHint}</p>
       <div class="form-actions">
-        <button class="btn btn-coral" type="submit" value="whatsapp">
+        <button class="btn btn-coral btn-bubbles" type="submit" value="whatsapp" aria-describedby="f-actions-hint">
           <Fa icon={faWhatsapp} /> {f.whatsapp}
         </button>
-        <button class="btn btn-ghost" type="submit" value="email">
+        <button class="btn btn-ghost" type="submit" value="email" aria-describedby="f-actions-hint">
           <Fa icon={faEnvelope} /> {f.emailSend}
         </button>
       </div>
       <p class="form-privacy">{f.privacy}</p>
-      <div class="form-done" data-form-done hidden tabindex="-1">
-        <Line name="confirm-circle" class="done-icon" />
-        <div>
+      <div class="form-done" data-form-done role="status" tabindex="-1">
+        <div class="stamp" aria-hidden="true"><Line name="confirm-circle" class="done-icon" /></div>
+        <div data-done-body hidden>
           <strong>{f.doneTitle}</strong>
           <p>{f.doneText}</p>
         </div>
@@ -120,7 +130,10 @@ const strings = {
   const form = document.querySelector<HTMLFormElement>('[data-join-form]')!;
   const s = JSON.parse(form.dataset.strings!) as Record<string, string>;
   const done = form.querySelector<HTMLElement>('[data-form-done]')!;
+  const doneBody = done.querySelector<HTMLElement>('[data-done-body]')!;
   const dates = form.querySelector<HTMLElement>('[data-dates]')!;
+  const name = form.elements.namedItem('name') as HTMLInputElement;
+  const nameError = document.getElementById('f-name-error')!;
 
   // Only ask for dates when someone is visiting or planning a trip.
   const syncDates = () => {
@@ -130,16 +143,21 @@ const strings = {
   form.addEventListener('change', syncDates);
   syncDates();
 
+  const setError = (on: boolean) => {
+    nameError.hidden = !on;
+    if (on) name.setAttribute('aria-invalid', 'true');
+    else name.removeAttribute('aria-invalid');
+  };
+  name.addEventListener('input', () => name.value.trim() && setError(false));
+
   form.addEventListener('submit', (e) => {
     e.preventDefault();
-    const name = form.elements.namedItem('name') as HTMLInputElement;
     if (!name.value.trim()) {
-      name.setAttribute('aria-invalid', 'true');
-      name.reportValidity();
+      setError(true);
       name.focus();
       return;
     }
-    name.removeAttribute('aria-invalid');
+    setError(false);
 
     const data = new FormData(form);
     const lines = [s.intro, ''];
@@ -163,8 +181,10 @@ const strings = {
       window.open(`https://wa.me/${number}?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
     }
 
-    done.hidden = false;
+    // The status region already exists, so screen readers announce the new text.
+    doneBody.hidden = false;
+    done.classList.add('is-done');
     done.querySelector<SVGSVGElement>('svg')?.setCurrentTime?.(0);
-    done.focus();
+    document.dispatchEvent(new CustomEvent('tdc:logged', { detail: done }));
   });
 </script>

@@ -1,6 +1,7 @@
 ---
 import { photos, srcset, unsplash, type Lang } from '../config';
 import { t } from '../i18n';
+import { rich } from '../lib/rich';
 import { diveCards, weekIcons, depths } from '../data';
 import SectionHead from './SectionHead.astro';
 import Fa from './Fa.astro';
@@ -9,10 +10,16 @@ import Line from './Line.astro';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const d = t(lang).dives;
+// A small school of fish that swims along the thermocline wave (decoration).
+const school = Array.from({ length: 9 }, (_, i) => ({
+  x: (i % 3) * 22 + (i > 5 ? 10 : 0),
+  y: Math.floor(i / 3) * 12 + (i % 2) * 4,
+  s: 0.75 + ((i * 37) % 5) / 10,
+}));
 ---
 <section class="section dives" id="dives" data-depth={depths.dives} aria-labelledby="dives-title">
   <div class="container">
-    <SectionHead id="dives" depth={depths.dives} kicker={d.kicker} title={d.title} lead={d.lead} />
+    <SectionHead lang={lang} id="dives" depth={depths.dives} kicker={d.kicker} title={d.title} lead={d.lead} />
 
     <ul class="cards">
       {d.cards.map((c) => {
@@ -25,6 +32,8 @@ const d = t(lang).dives;
                 src={unsplash(p.id, 600, 0.75)}
                 srcset={srcset(p.id, [400, 600, 900], 0.75)}
                 sizes="(min-width: 1100px) 280px, (min-width: 640px) 45vw, 92vw"
+                width="600"
+                height="450"
                 alt={c.alt}
                 loading="lazy"
                 decoding="async"
@@ -33,7 +42,7 @@ const d = t(lang).dives;
             <div class="card-body">
               <span class="card-icon"><Fa icon={meta.icon} /></span>
               <h3>{c.title}</h3>
-              <p>{c.text}</p>
+              <p set:html={rich(c.text, lang)} />
               <span class="tag">{c.tag}</span>
             </div>
           </li>
@@ -49,13 +58,20 @@ const d = t(lang).dives;
       <ol class="week-list">
         {d.week.map((w) => (
           <li>
-            <span class="week-day">{w.day}</span>
+            <span class="week-day"><abbr title={w.dayLong}>{w.day}</abbr></span>
             <span class="week-time">{w.time}</span>
             <span class="week-what"><Fa icon={weekIcons[w.id]} /> {w.what}</span>
           </li>
         ))}
       </ol>
     </div>
+  </div>
+  <div class="school" aria-hidden="true">
+    {school.map((f) => (
+      <svg class="fish" viewBox="0 0 24 12" style={`--x:${f.x}px;--y:${f.y}px;--s:${f.s}`}>
+        <path d="M2 6c4-5 11-5 15 0-4 5-11 5-15 0Zm15 0 5-4v8Z" fill="currentColor" />
+      </svg>
+    ))}
   </div>
   <svg class="thermocline" viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true">
     <path d="M0 50c120 22 240 30 360 18S600 20 720 26s240 42 360 40 240-34 360-30v54H0Z" fill="currentColor" opacity=".35" />

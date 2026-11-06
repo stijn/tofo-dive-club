@@ -1,6 +1,7 @@
 ---
 import type { Lang } from '../config';
 import { t } from '../i18n';
+import { rich } from '../lib/rich';
 import { depths } from '../data';
 import SectionHead from './SectionHead.astro';
 import Line from './Line.astro';
@@ -11,7 +12,9 @@ const d = t(lang).faq;
 ---
 <section class="section faq deep" id="faq" data-depth={depths.faq} aria-labelledby="faq-title">
   <div class="container faq-grid">
-    <SectionHead id="faq" depth={depths.faq} kicker={d.kicker} title={d.title} />
+    <SectionHead lang={lang} id="faq" depth={depths.faq} kicker={d.kicker} title={d.title}>
+      <p class="faq-glossary reveal"><a href="#glossary"><Line name="text-box-multiple" /> {d.glossaryLink}</a></p>
+    </SectionHead>
     <div class="faq-list">
       {d.items.map((item) => (
         <details class="faq-item reveal">
@@ -19,7 +22,7 @@ const d = t(lang).faq;
             <span>{item.q}</span>
             <Line name="chevron-small-down" class="faq-chevron" />
           </summary>
-          <p>{item.a}</p>
+          <p set:html={rich(item.a, lang)} />
         </details>
       ))}
     </div>

@@ -1,0 +1,52 @@
+---
+// The founding offer: membership plans plus the promises that answer what
+// visitors and residents miss at other operators (see the market research).
+import type { Lang } from '../config';
+import { t } from '../i18n';
+import { rich } from '../lib/rich';
+import { depths, promiseIcons } from '../data';
+import SectionHead from './SectionHead.astro';
+import Fa from './Fa.astro';
+import Line from './Line.astro';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = t(lang).offer;
+---
+<section class="section offer deep" id="offer" data-depth={depths.offer} aria-labelledby="offer-title">
+  <div class="bubbles" aria-hidden="true"></div>
+  <div class="container">
+    <SectionHead lang={lang} id="offer" depth={depths.offer} kicker={d.kicker} title={d.title} lead={d.lead} />
+
+    <ul class="plans">
+      {d.plans.map((p) => (
+        <li class:list={['plan reveal', { 'is-featured': p.featured }]} aria-labelledby={`plan-${p.id}`}>
+          {p.featured && <span class="plan-flag">{d.featured}</span>}
+          <h3 id={`plan-${p.id}`}>{p.name}</h3>
+          <p class="plan-for">{p.for}</p>
+          <p class="plan-price"><strong set:html={rich(p.price, lang)} /> <span>{p.per}</span></p>
+          <ul class="plan-perks">
+            {p.perks.map((perk) => (
+              <li><Line name="confirm" /> <span set:html={rich(perk, lang)} /></li>
+            ))}
+          </ul>
+          <a class:list={['btn', p.featured ? 'btn-coral btn-bubbles' : 'btn-ghost']} href="#join">{p.cta}</a>
+        </li>
+      ))}
+    </ul>
+
+    <h3 class="promises-title reveal">{d.promisesTitle}</h3>
+    <ul class="promises">
+      {d.promises.map((p) => (
+        <li class="promise reveal">
+          <span class="promise-icon"><Fa icon={promiseIcons[p.id]} /></span>
+          <div>
+            <h4>{p.title}</h4>
+            <p set:html={rich(p.text, lang)} />
+          </div>
+        </li>
+      ))}
+    </ul>
+    <p class="note reveal"><Line name="alert-circle" /> <span set:html={rich(d.note, lang)} /></p>
+  </div>
+</section>

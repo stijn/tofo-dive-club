@@ -1,0 +1,17 @@
+{
+  "name": "Clube de Mergulho do Tofo",
+  "short_name": "Mergulho Tofo",
+  "description": "Clube de mergulho comunitário na Praia do Tofo, Moçambique.",
+  "lang": "pt-MZ",
+  "start_url": "/tofo-dive-club/pt/",
+  "scope": "/tofo-dive-club/",
+  "display": "standalone",
+  "background_color": "#04192a",
+  "theme_color": "#04192a",
+  "icons": [
+    { "src": "/tofo-dive-club/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/tofo-dive-club/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/tofo-dive-club/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "/tofo-dive-club/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

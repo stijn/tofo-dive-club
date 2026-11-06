@@ -1,6 +1,7 @@
 ---
 import { photos, srcset, unsplash, type Lang } from '../config';
 import { t } from '../i18n';
+import { rich } from '../lib/rich';
 import Line from './Line.astro';
 import Fa from './Fa.astro';
 import { statIcons, depths } from '../data';
@@ -10,28 +11,31 @@ const { lang } = Astro.props;
 const d = t(lang);
 const p = photos.heroWhaleShark;
 ---
-<section class="hero" id="top" data-depth={depths.hero}>
+<section class="hero" id="top" data-depth={depths.hero} aria-labelledby="hero-title">
   <img
     class="hero-img"
     src={unsplash(p.id, 1600)}
     srcset={srcset(p.id, [640, 960, 1280, 1600, 2000, 2560])}
     sizes="100vw"
+    width="1600"
+    height="1067"
     alt={d.hero.photoAlt}
     fetchpriority="high"
     decoding="async"
   />
+  <div class="hero-caustics" aria-hidden="true"></div>
   <div class="hero-shade" aria-hidden="true"></div>
   <div class="container hero-inner">
     <p class="hero-place reveal">
       <Line name="map-marker-alt-loop" />
       {d.hero.place}
     </p>
-    <h1 class="hero-title reveal">
+    <h1 class="hero-title reveal" id="hero-title" tabindex="-1">
       {d.hero.titleStart} <em>{d.hero.titleEm}</em>
     </h1>
-    <p class="hero-lead reveal">{d.hero.lead}</p>
+    <p class="hero-lead reveal" set:html={rich(d.hero.lead, lang)} />
     <div class="hero-actions reveal">
-      <a class="btn btn-coral" href="#join">
+      <a class="btn btn-coral btn-bubbles" href="#join">
         {d.hero.primary}
         <Line name="arrow-right" />
       </a>
@@ -43,7 +47,7 @@ const p = photos.heroWhaleShark;
     <Line name="chevron-small-double-down" />
   </a>
   <p class="photo-credit hero-credit">
-    {d.hero.credit}: <a href={p.url} rel="noopener">{p.by}</a> / Unsplash
+    {d.hero.credit}: <a href={p.url} rel="noopener" aria-label={d.hero.creditLabel.replace('{by}', p.by)}>{p.by}</a> / Unsplash
   </p>
 </section>
 
@@ -52,7 +56,7 @@ const p = photos.heroWhaleShark;
     {d.stats.map((s) => (
       <li class="stat reveal">
         <span class="stat-icon"><Fa icon={statIcons[s.id]} /></span>
-        <strong>{s.value}</strong>
+        <strong set:html={rich(s.value, lang)} />
         <span>{s.label}</span>
       </li>
     ))}

@@ -19,6 +19,9 @@ export default defineConfig({
   integrations: [
     sitemap({
       i18n: { defaultLocale: 'en', locales: { en: 'en', pt: 'pt-MZ' } },
+      filter: (page) => !page.includes('404'),
+      lastmod: new Date(),
+      changefreq: 'monthly',
     }),
   ],
 });

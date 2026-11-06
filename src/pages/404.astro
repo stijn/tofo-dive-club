@@ -1,0 +1,36 @@
+---
+// GitHub Pages serves this for any unknown URL. Both languages on one page,
+// since we can't tell which one the visitor wanted.
+import { getRelativeLocaleUrl } from 'astro:i18n';
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import SmbIcon from '../components/SmbIcon.astro';
+import { t } from '../i18n';
+
+const en = t('en').notFound;
+const pt = t('pt').notFound;
+---
+<Base lang="en" title={t('en').meta.notFoundTitle} noindex>
+  <Header lang="en" minimal />
+  <main id="main" class="lost deep" tabindex="-1">
+    <div class="bubbles" aria-hidden="true"></div>
+    <div class="container lost-inner">
+      <SmbIcon class="lost-smb" />
+      <p class="kicker"><span class="kicker-depth">{en.kicker}</span><span>40+ <abbr title="metres">m</abbr></span></p>
+      <h1 id="hero-title" tabindex="-1">{en.title}</h1>
+      <p class="lead">{en.text}</p>
+      <p><a class="btn btn-coral" href={getRelativeLocaleUrl('en', '')}>{en.home}</a></p>
+      <div lang="pt-MZ" class="lost-pt">
+        <h2>{pt.title}</h2>
+        <p class="lead">{pt.text}</p>
+        <p><a class="btn btn-ghost" href={getRelativeLocaleUrl('pt', '')}>{pt.home}</a></p>
+      </div>
+    </div>
+  </main>
+  <Footer lang="en" minimal />
+  <script>
+    import '../scripts/motion';
+    import '../scripts/treats';
+  </script>
+</Base>
