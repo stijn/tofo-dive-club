@@ -15,6 +15,10 @@ Every change to the site is logged here, newest first. Add to it in the same com
 - Accessibility check with real screen-reader users (VoiceOver, TalkBack, NVDA), beyond the automated AAA audit.
 - Own domain.
 
+## 0.3.1 · 2026-11-06
+
+- **Mantas really swim forward now**: in 0.3.0 the wing-beat animation replaced the SVG transform that turned the manta, so it still showed head-up and clipped. The turn and the flap now sit on separate groups. Checked by rendering every manta (seasons glider, seasons cell, "manta" easter egg) frozen at three moments of the wing beat.
+
 ## 0.3.0 · 2026-11-06
 
 - **Swimmers face forward**: the fish school and every manta (the gliding one, the "manta" easter egg) now face the way they swim; mantas flap their wings up and down.

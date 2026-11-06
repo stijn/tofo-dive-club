@@ -7,7 +7,9 @@ const mantaBody =
   '<path fill="currentColor" d="M32 6c-5 0-10.5 4-24 9.6 11.5 1.6 18.4 5.6 21.4 10.6.9 1.6 1.7 3.6 2.6 6 .9-2.4 1.7-4.4 2.6-6 3-5 9.9-9 21.4-10.6C42.5 10 37 6 32 6Z"/>' +
   '<path d="M28.6 7.2c-1.8-1.3-2.1-3.2-.9-4.6M35.4 7.2c1.8-1.3 2.1-3.2.9-4.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>' +
   '<path d="M32 31v8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>';
-export const manta = `<svg class="creature creature-manta" viewBox="0 0 40 64" aria-hidden="true" focusable="false"><g class="wings" transform="translate(40 0) rotate(90)">${mantaBody}</g></svg>`;
+// The turn lives on an outer group; the wing flap animates an inner one. (A CSS
+// animation on the same element would replace its transform attribute and undo the turn.)
+export const manta = `<svg class="creature creature-manta" viewBox="0 0 40 64" aria-hidden="true" focusable="false"><g transform="translate(40 0) rotate(90)"><g class="wings">${mantaBody}</g></g></svg>`;
 
 // Whale shark, side view: tail on the left, wide flat head on the right, pale spots.
 export const whaleShark =
