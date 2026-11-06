@@ -1,0 +1,60 @@
+---
+// Dive-computer style depth gauge. Moves from 0 m to 30 m as the page scrolls.
+import type { Lang } from '../config';
+import { t } from '../i18n';
+import { maxDepth } from '../data';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = t(lang);
+---
+<aside class="gauge is-surface" aria-hidden="true" data-gauge data-max={maxDepth}>
+  <span class="gauge-label">{d.gauge.label}</span>
+  <span class="gauge-readout"><span data-gauge-value>0</span> m</span>
+  <span class="gauge-track">
+    {[0, 10, 20, 30].map((m) => <span class="gauge-tick" style={`--at:${m / maxDepth}`}>{m}</span>)}
+    <span class="gauge-fill" data-gauge-fill></span>
+    <span class="gauge-dot" data-gauge-dot></span>
+  </span>
+</aside>
+
+<script>
+  const value = document.querySelector<HTMLElement>('[data-gauge-value]')!;
+  const gauge = document.querySelector<HTMLElement>('[data-gauge]')!;
+  const sections = [...document.querySelectorAll<HTMLElement>('[data-depth]')];
+  const maxDepth = Number(gauge.dataset.max) || 30;
+
+  let ticking = false;
+  const update = () => {
+    ticking = false;
+    const probe = window.scrollY + 72;
+    const atBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2;
+    let depth = 0;
+    for (let i = 0; i < sections.length; i++) {
+      const s = sections[i];
+      const top = s.offsetTop;
+      const bottom = top + s.offsetHeight;
+      if (probe >= top && probe < bottom) {
+        const from = Number(s.dataset.depth);
+        const to = Number(sections[i + 1]?.dataset.depth ?? from);
+        depth = from + (to - from) * ((probe - top) / (bottom - top));
+        break;
+      }
+      if (probe >= bottom) depth = Number(sections[i + 1]?.dataset.depth ?? s.dataset.depth);
+    }
+    if (atBottom) depth = maxDepth;
+    const shown = Math.round(depth);
+    value.textContent = String(shown);
+    gauge.style.setProperty('--depth', String(depth / maxDepth));
+    gauge.classList.toggle('is-surface', shown === 0);
+  };
+  const onScroll = () => {
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(update);
+    }
+  };
+  update();
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+</script>

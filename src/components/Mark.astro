@@ -1,0 +1,16 @@
+---
+// Club mark: a manta ray in a porthole.
+interface Props { class?: string }
+const { class: cls } = Astro.props;
+---
+<svg class:list={['mark', cls]} viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+  <circle cx="32" cy="32" r="30" fill="var(--mark-bg, #0a3d57)" />
+  <circle cx="32" cy="32" r="30" fill="none" stroke="var(--mark-ring, #ff7a5c)" stroke-width="3" />
+  <path
+    fill="var(--mark-fg, #f5efe4)"
+    d="M32 21c-5 0-10.5 4-24 9.6 11.5 1.6 18.4 5.6 21.4 10.6.9 1.6 1.7 3.6 2.6 6 .9-2.4 1.7-4.4 2.6-6 3-5 9.9-9 21.4-10.6C42.5 25 37 21 32 21Z"
+  />
+  <path d="M32 46.5V57" stroke="var(--mark-fg, #f5efe4)" stroke-width="1.6" stroke-linecap="round" />
+  <path d="M28.6 22.4c-2-1.6-2.4-3.9-1-5.6M35.4 22.4c2-1.6 2.4-3.9 1-5.6" fill="none" stroke="var(--mark-fg, #f5efe4)" stroke-width="2" stroke-linecap="round" />
+  <path d="M10 44c4 2 8 2 12 0s8-2 12 0 8 2 12 0 6-1.6 8-.8" fill="none" stroke="var(--mark-ring, #ff7a5c)" stroke-width="1.6" stroke-linecap="round" opacity=".7" />
+</svg>

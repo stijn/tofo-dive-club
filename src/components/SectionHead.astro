@@ -1,0 +1,11 @@
+---
+// Section heading with its "depth stop" label, e.g. "10 m · Dives".
+interface Props { depth: number; kicker: string; title: string; lead?: string; id: string }
+const { depth, kicker, title, lead, id } = Astro.props;
+---
+<header class="section-head">
+  <p class="kicker reveal"><span class="kicker-depth">{String(depth).padStart(2, '0')} m</span>{kicker}</p>
+  <h2 class="reveal" id={`${id}-title`}>{title}</h2>
+  {lead && <p class="lead reveal">{lead}</p>}
+  <slot />
+</header>

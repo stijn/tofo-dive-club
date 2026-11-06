@@ -1,0 +1,60 @@
+---
+import { photos, srcset, unsplash, type Lang } from '../config';
+import { t } from '../i18n';
+import Line from './Line.astro';
+import Fa from './Fa.astro';
+import { statIcons, depths } from '../data';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = t(lang);
+const p = photos.heroWhaleShark;
+---
+<section class="hero" id="top" data-depth={depths.hero}>
+  <img
+    class="hero-img"
+    src={unsplash(p.id, 1600)}
+    srcset={srcset(p.id, [640, 960, 1280, 1600, 2000, 2560])}
+    sizes="100vw"
+    alt={d.hero.photoAlt}
+    fetchpriority="high"
+    decoding="async"
+  />
+  <div class="hero-shade" aria-hidden="true"></div>
+  <div class="container hero-inner">
+    <p class="hero-place reveal">
+      <Line name="map-marker-alt-loop" />
+      {d.hero.place}
+    </p>
+    <h1 class="hero-title reveal">
+      {d.hero.titleStart} <em>{d.hero.titleEm}</em>
+    </h1>
+    <p class="hero-lead reveal">{d.hero.lead}</p>
+    <div class="hero-actions reveal">
+      <a class="btn btn-coral" href="#join">
+        {d.hero.primary}
+        <Line name="arrow-right" />
+      </a>
+      <a class="btn btn-ghost" href="#sites">{d.hero.secondary}</a>
+    </div>
+  </div>
+  <a class="hero-descend" href="#club">
+    <span>{d.hero.descend}</span>
+    <Line name="chevron-small-double-down" />
+  </a>
+  <p class="photo-credit hero-credit">
+    {d.hero.credit}: <a href={p.url} rel="noopener">{p.by}</a> / Unsplash
+  </p>
+</section>
+
+<div class="stats">
+  <ul class="container stats-list">
+    {d.stats.map((s) => (
+      <li class="stat reveal">
+        <span class="stat-icon"><Fa icon={statIcons[s.id]} /></span>
+        <strong>{s.value}</strong>
+        <span>{s.label}</span>
+      </li>
+    ))}
+  </ul>
+</div>

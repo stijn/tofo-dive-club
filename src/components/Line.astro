@@ -1,0 +1,30 @@
+---
+// line-md animated icon (Iconify), inlined at build time so its SVG animations run.
+// src/scripts/line-md.ts replays the animation when the icon scrolls into view.
+import { icons } from '@iconify-json/line-md';
+import { getIconData, iconToSVG, iconToHTML, replaceIDs } from '@iconify/utils';
+
+interface Props {
+  name: string;
+  class?: string;
+  label?: string;
+}
+const { name, class: cls, label } = Astro.props;
+const data = getIconData(icons, name);
+if (!data) throw new Error(`line-md icon not found: ${name}`);
+const { attributes, body } = iconToSVG(data, { height: '1em' });
+const attrs: Record<string, string> = {
+  ...attributes,
+  class: ['icon icon-line', cls].filter(Boolean).join(' '),
+  'data-line-md': name,
+  focusable: 'false',
+};
+if (label) {
+  attrs.role = 'img';
+  attrs['aria-label'] = label;
+} else {
+  attrs['aria-hidden'] = 'true';
+}
+const html = iconToHTML(replaceIDs(body), attrs);
+---
+<Fragment set:html={html} />

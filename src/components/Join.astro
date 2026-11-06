@@ -1,0 +1,170 @@
+---
+import { club, type Lang } from '../config';
+import { t } from '../i18n';
+import { depths } from '../data';
+import SectionHead from './SectionHead.astro';
+import Line from './Line.astro';
+import Fa from './Fa.astro';
+import { faWhatsapp } from '@fortawesome/free-brands-svg-icons';
+import { faEnvelope } from '@fortawesome/free-regular-svg-icons';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = t(lang).join;
+const f = d.form;
+const stepIcons = ['account-add', 'chat-round-dots', 'water'];
+const strings = {
+  name: f.name, email: f.email, cert: f.cert, dives: f.dives, stay: f.stay,
+  dates: f.dates, interests: f.interests, message: f.message,
+  intro: f.intro, subject: f.subject,
+};
+---
+<section class="section join deep" id="join" data-depth={depths.join} aria-labelledby="join-title">
+  <div class="container join-grid">
+    <div>
+      <SectionHead id="join" depth={depths.join} kicker={d.kicker} title={d.title} lead={d.lead} />
+      <ol class="steps">
+        {d.steps.map((s, i) => (
+          <li class="step reveal">
+            <span class="step-icon"><Line name={stepIcons[i]} /></span>
+            <div>
+              <h3><span class="step-n">{i + 1}</span> {s.title}</h3>
+              <p>{s.text}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+
+    <form
+      class="join-form reveal"
+      data-join-form
+      data-whatsapp={club.whatsapp}
+      data-email={club.email}
+      data-strings={JSON.stringify(strings)}
+      novalidate
+    >
+      <div class="field">
+        <label for="f-name">{f.name}</label>
+        <input id="f-name" name="name" autocomplete="name" required />
+      </div>
+      <div class="field">
+        <label for="f-email">{f.email}</label>
+        <input id="f-email" name="email" type="email" autocomplete="email" />
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="f-cert">{f.cert}</label>
+          <select id="f-cert" name="cert">
+            {f.certOptions.map((o) => <option>{o}</option>)}
+          </select>
+        </div>
+        <div class="field">
+          <label for="f-dives">{f.dives}</label>
+          <select id="f-dives" name="dives">
+            {f.diveOptions.map((o) => <option>{o}</option>)}
+          </select>
+        </div>
+      </div>
+      <fieldset class="field">
+        <legend>{f.stay}</legend>
+        <div class="chips">
+          {f.stayOptions.map((o, i) => (
+            <label class="chip">
+              <input type="radio" name="stay" value={o} checked={i === 0} />
+              <span>{o}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+      <div class="field" data-dates>
+        <label for="f-dates">{f.dates}</label>
+        <input id="f-dates" name="dates" placeholder={f.datesPlaceholder} />
+      </div>
+      <fieldset class="field">
+        <legend>{f.interests}</legend>
+        <div class="chips">
+          {f.interestOptions.map((o) => (
+            <label class="chip">
+              <input type="checkbox" name="interests" value={o} />
+              <span>{o}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+      <div class="field">
+        <label for="f-message">{f.message}</label>
+        <textarea id="f-message" name="message" rows="3" placeholder={f.messagePlaceholder}></textarea>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-coral" type="submit" value="whatsapp">
+          <Fa icon={faWhatsapp} /> {f.whatsapp}
+        </button>
+        <button class="btn btn-ghost" type="submit" value="email">
+          <Fa icon={faEnvelope} /> {f.emailSend}
+        </button>
+      </div>
+      <p class="form-privacy">{f.privacy}</p>
+      <div class="form-done" data-form-done hidden tabindex="-1">
+        <Line name="confirm-circle" class="done-icon" />
+        <div>
+          <strong>{f.doneTitle}</strong>
+          <p>{f.doneText}</p>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-join-form]')!;
+  const s = JSON.parse(form.dataset.strings!) as Record<string, string>;
+  const done = form.querySelector<HTMLElement>('[data-form-done]')!;
+  const dates = form.querySelector<HTMLElement>('[data-dates]')!;
+
+  // Only ask for dates when someone is visiting or planning a trip.
+  const syncDates = () => {
+    const first = form.querySelector<HTMLInputElement>('input[name="stay"]')!;
+    dates.hidden = first.checked;
+  };
+  form.addEventListener('change', syncDates);
+  syncDates();
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = form.elements.namedItem('name') as HTMLInputElement;
+    if (!name.value.trim()) {
+      name.setAttribute('aria-invalid', 'true');
+      name.reportValidity();
+      name.focus();
+      return;
+    }
+    name.removeAttribute('aria-invalid');
+
+    const data = new FormData(form);
+    const lines = [s.intro, ''];
+    const add = (label: string, value: string) => value.trim() && lines.push(`${label}: ${value.trim()}`);
+    add(s.name, String(data.get('name') ?? ''));
+    add(s.email, String(data.get('email') ?? ''));
+    add(s.cert, String(data.get('cert') ?? ''));
+    add(s.dives, String(data.get('dives') ?? ''));
+    add(s.stay, String(data.get('stay') ?? ''));
+    if (!dates.hidden) add(s.dates, String(data.get('dates') ?? ''));
+    add(s.interests, data.getAll('interests').join(', '));
+    add(s.message, String(data.get('message') ?? ''));
+    const text = lines.join('\n');
+
+    const via = (e.submitter as HTMLButtonElement | null)?.value ?? 'whatsapp';
+    if (via === 'email') {
+      const to = form.dataset.email ?? '';
+      window.location.href = `mailto:${to}?subject=${encodeURIComponent(s.subject)}&body=${encodeURIComponent(text)}`;
+    } else {
+      const number = (form.dataset.whatsapp ?? '').replace(/\D/g, '');
+      window.open(`https://wa.me/${number}?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
+    }
+
+    done.hidden = false;
+    done.querySelector<SVGSVGElement>('svg')?.setCurrentTime?.(0);
+    done.focus();
+  });
+</script>

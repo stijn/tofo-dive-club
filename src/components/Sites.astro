@@ -1,0 +1,46 @@
+---
+import type { Lang } from '../config';
+import { t } from '../i18n';
+import { sites, maxDepth, depths } from '../data';
+import SectionHead from './SectionHead.astro';
+import Line from './Line.astro';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = t(lang).sites;
+const ticks = [0, 10, 20, 30];
+const range = (id: string) => {
+  const [min, max] = sites[id].depth;
+  return min === 0 ? d.surface : `${min}–${max} m`;
+};
+---
+<section class="section sites deep" id="sites" data-depth={depths.sites} aria-labelledby="sites-title">
+  <div class="container">
+    <SectionHead id="sites" depth={depths.sites} kicker={d.kicker} title={d.title} lead={d.lead} />
+
+    <div class="profile">
+      <div class="profile-axis" aria-hidden="true">
+        {ticks.map((m) => <span style={`--at:${m / maxDepth}`}>{m} m</span>)}
+      </div>
+      <ol class="site-list">
+        {d.list.map((s) => {
+          const { depth: [min, max], level } = sites[s.id];
+          return (
+            <li class={`site reveal level-${level}`} style={`--min:${min / maxDepth};--max:${max / maxDepth}`}>
+              <div class="site-track" aria-hidden="true"><span class="site-range"></span></div>
+              <div class="site-body">
+                <h3>{s.name}</h3>
+                <p class="site-meta">
+                  <span class="site-depth"><span class="visually-hidden">{d.depth}: </span>{range(s.id)}</span>
+                  <span class="tag">{d.levels[level]}</span>
+                </p>
+                <p>{s.text}</p>
+              </div>
+            </li>
+          );
+        })}
+      </ol>
+    </div>
+    <p class="note reveal"><Line name="alert-circle" /> {d.note}</p>
+  </div>
+</section>

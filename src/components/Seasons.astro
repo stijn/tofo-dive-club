@@ -1,0 +1,80 @@
+---
+import { photos, srcset, unsplash, type Lang } from '../config';
+import { t } from '../i18n';
+import { seasons, waterTemp, depths } from '../data';
+import SectionHead from './SectionHead.astro';
+import Line from './Line.astro';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = t(lang).seasons;
+const levelText = [d.legend.unlikely, d.legend.possible, d.legend.peak];
+const rows = (['sharks', 'mantas', 'whales'] as const).map((k) => ({ key: k, name: d.rows[k], values: seasons[k] }));
+const whale = photos.humpback;
+---
+<section class="section seasons deep" id="seasons" data-depth={depths.seasons} aria-labelledby="seasons-title">
+  <div class="container">
+    <div class="seasons-top">
+      <SectionHead id="seasons" depth={depths.seasons} kicker={d.kicker} title={d.title} lead={d.lead} />
+      <figure class="whale reveal">
+        <img
+          src={unsplash(whale.id, 640, 0.56)}
+          srcset={srcset(whale.id, [400, 640, 960], 0.56)}
+          sizes="(min-width: 960px) 420px, 92vw"
+          alt={d.photoAlt}
+          loading="lazy"
+          decoding="async"
+        />
+        <figcaption><Line name="alert-circle" /> {d.note}</figcaption>
+      </figure>
+    </div>
+
+    <div class="season-wrap reveal">
+      <table class="season-table">
+        <caption class="visually-hidden">{d.caption}</caption>
+        <thead>
+          <tr>
+            <td></td>
+            {d.months.map((m, i) => (
+              <th scope="col" data-month={i}>
+                <abbr title={d.monthsLong[i]}><span class="m-long">{m}</span><span class="m-short" aria-hidden="true">{m.charAt(0)}</span></abbr>
+                <span class="now-flag" aria-hidden="true">{d.now}</span>
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((r) => (
+            <tr>
+              <th scope="row">{r.name}</th>
+              {r.values.map((v, i) => (
+                <td data-month={i} class={`lvl lvl-${v}`}>
+                  <span class="dot" aria-hidden="true"></span>
+                  <span class="visually-hidden">{levelText[v]}</span>
+                </td>
+              ))}
+            </tr>
+          ))}
+          <tr class="temp-row">
+            <th scope="row">{d.rows.temp}</th>
+            {waterTemp.map((c, i) => (
+              <td data-month={i} style={`--warm:${(c - 21) / 7}`}><span>{c}</span></td>
+            ))}
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ul class="legend reveal" aria-hidden="true">
+      <li><span class="dot lvl-2"></span>{d.legend.peak}</li>
+      <li><span class="dot lvl-1"></span>{d.legend.possible}</li>
+      <li><span class="dot lvl-0"></span>{d.legend.unlikely}</li>
+    </ul>
+  </div>
+</section>
+
+<script>
+  // Mark the current month (visitor's clock, so it stays right after the build date).
+  const m = new Date().getMonth();
+  document.querySelectorAll<HTMLElement>(`.season-table [data-month="${m}"]`).forEach((el) => el.classList.add('is-now'));
+</script>

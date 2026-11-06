@@ -1,0 +1,245 @@
+// English copy. pt.ts must have the same shape (TypeScript checks it).
+
+const en = {
+  meta: {
+    title: 'Tofo Dive Club · Community diving on the Manta Coast, Mozambique',
+    description:
+      'A small, community-run dive club in Praia do Tofo, Mozambique. Whale sharks, manta rays and reef dives with a regular crew. Join the founding members.',
+    ogAlt: 'A whale shark swimming through blue water with sun rays above',
+  },
+  skip: 'Skip to content',
+  nav: {
+    club: 'The club',
+    dives: 'Dives',
+    sites: 'Sites',
+    seasons: 'Seasons',
+    faq: 'FAQ',
+    join: 'Join',
+    menu: 'Menu',
+    home: 'Tofo Dive Club, home',
+  },
+  lang: { other: 'PT', otherLabel: 'Ler em português' },
+  gauge: { label: 'Depth' },
+  hero: {
+    place: 'Praia do Tofo · Inhambane · Mozambique',
+    titleStart: 'A dive club for the',
+    titleEm: 'Manta Coast',
+    lead: 'Whale sharks all year, manta cleaning stations and warm Indian Ocean reefs. We’re starting a small, community-run club in Tofo, so you always have a buddy, a seat on the boat and a crew for drinks after.',
+    primary: 'Join the founding crew',
+    secondary: 'See the dive sites',
+    descend: 'Start your descent',
+    photoAlt: 'A whale shark swimming through deep blue water with sun rays above',
+    credit: 'Photo',
+  },
+  stats: [
+    { id: 'sharks', value: 'Year-round', label: 'whale sharks off Tofo' },
+    { id: 'temp', value: '22–28 °C', label: 'water through the year' },
+    { id: 'whales', value: 'Jun–Nov', label: 'humpback whale season' },
+    { id: 'lang', value: 'EN · PT', label: 'club languages' },
+  ],
+  club: {
+    kicker: 'The club',
+    title: 'Tofo already has good dive centres. What it lacks is a crew.',
+    lead: 'Visitors dive for a week and leave. Residents dive alone, or not at all. A club fixes that: fixed dates, familiar buddies and people who know which way the current runs at Manta Reef.',
+    pillars: [
+      {
+        id: 'buddies',
+        title: 'Same buddies, every week',
+        text: 'Club dives on fixed days. Turn up, find your buddy, go diving.',
+      },
+      {
+        id: 'boats',
+        title: 'Boats with local centres',
+        text: 'We book with licensed Tofo dive centres and fill the boat together, so trips still run in the quiet months.',
+      },
+      {
+        id: 'learn',
+        title: 'Keep learning',
+        text: 'Skills refreshers, fish-ID evenings and courses with partner instructors, from first breath to divemaster.',
+      },
+      {
+        id: 'reef',
+        title: 'Give back to the reef',
+        text: 'Beach cleans, and ID photos of mantas and whale sharks shared with the researchers who track them.',
+      },
+    ],
+    founderTitle: 'Started by Isa',
+    founderText:
+      'Isa is moving to Tofo for the diving and is starting the club so that newcomers and locals have people to dive with. It’s early days: the first members decide how the club runs.',
+    photoAlt: 'A diver making hand signals underwater',
+    beachAlt: 'Praia do Tofo: a long sandy beach with green water and people walking',
+  },
+  dives: {
+    kicker: 'What we do',
+    title: 'Dives, safaris and evenings ashore',
+    lead: 'Members choose what they join. Everything on the water runs with licensed local operators.',
+    cards: [
+      {
+        id: 'reef',
+        title: 'Club reef dives',
+        text: 'Two-tank mornings on Tofo’s offshore reefs, planned around tides, swell and who’s in town.',
+        tag: 'Certified divers',
+        alt: 'A group of manta rays gliding over divers',
+      },
+      {
+        id: 'safari',
+        title: 'Ocean safaris',
+        text: 'Snorkel trips to look for whale sharks and dolphins along the coast. No certification needed.',
+        tag: 'Everyone',
+        alt: 'A whale shark seen from above near the surface',
+      },
+      {
+        id: 'learn',
+        title: 'Try dives & courses',
+        text: 'Start with a try dive or go further with partner instructors. Club buddies make the first ocean dives less daunting.',
+        tag: 'Beginners',
+        alt: 'Two divers next to a school of yellow fish',
+      },
+      {
+        id: 'nights',
+        title: 'Club nights',
+        text: 'Fish-ID talks, photo swaps, planning the week’s dives, and a drink as the sun goes down.',
+        tag: 'Members',
+        alt: 'A surfer walking along Tofo beach in the evening light',
+      },
+    ],
+    weekTitle: 'A sample club week',
+    weekNote: 'Draft schedule. The founding members set the real one.',
+    week: [
+      { id: 'sunrise', day: 'Tue', time: '06:30', what: 'Sunrise reef dive' },
+      { id: 'safari', day: 'Thu', time: '09:00', what: 'Ocean safari' },
+      { id: 'night', day: 'Fri', time: '18:00', what: 'Club night' },
+      { id: 'double', day: 'Sat', time: '07:00', what: 'Two-tank morning' },
+      { id: 'clean', day: 'Sun', time: '08:00', what: 'Beach clean' },
+    ],
+  },
+  sites: {
+    kicker: 'Dive sites',
+    title: 'The reefs we’ll dive',
+    lead: 'Tofo’s best sites sit a short boat ride offshore. Boats launch from the beach, straight through the surf. A few favourites:',
+    note: 'Depths are approximate. Your dive centre briefs every dive.',
+    depth: 'Depth',
+    surface: 'Surface',
+    levels: { all: 'Everyone', beginner: 'Beginner-friendly', advanced: 'Advanced' },
+    list: [
+      {
+        id: 'safari',
+        name: 'Ocean safari',
+        text: 'Whale sharks feed close to the surface. Snorkel alongside them on a guided safari.',
+      },
+      {
+        id: 'salon',
+        name: 'Salon',
+        text: 'Shallower and gentler. A good first ocean dive or check-out dive.',
+      },
+      {
+        id: 'manta',
+        name: 'Manta Reef',
+        text: 'The famous one. Cleaning stations where mantas queue up to be cleaned, and big schools over the reef.',
+      },
+      {
+        id: 'office',
+        name: 'The Office',
+        text: 'A maze of gullies, pinnacles and ledges, with plenty to explore in one dive.',
+      },
+      {
+        id: 'giants',
+        name: 'Giant’s Castle',
+        text: 'A deep ridge with ledges and gullies, and good odds for rays and bigger animals.',
+      },
+    ],
+  },
+  seasons: {
+    kicker: 'Seasons',
+    title: 'What’s in the water, month by month',
+    lead: 'Wildlife keeps no timetable, but these are the usual patterns off Tofo.',
+    months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+    monthsLong: [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December',
+    ],
+    rows: { sharks: 'Whale sharks', mantas: 'Manta rays', whales: 'Humpback whales', temp: 'Water °C (approx.)' },
+    legend: { peak: 'Best chances', possible: 'Possible', unlikely: 'Unlikely' },
+    now: 'Now',
+    caption: 'Wildlife and water temperature by month off Tofo',
+    note: 'Humpbacks are watched from the boat. Swimming with whales is not allowed.',
+    photoAlt: 'A humpback whale breaching out of the sea',
+  },
+  join: {
+    kicker: 'Join',
+    title: 'Become a founding member',
+    lead: 'No fees yet. Tell us who you are and how you like to dive, and we’ll add you to the club group once the first dates are set.',
+    steps: [
+      { id: 'form', title: 'Tell us about you', text: 'Fill in the form. It takes a minute.' },
+      { id: 'group', title: 'Join the group', text: 'We add you to the club’s WhatsApp group.' },
+      { id: 'dive', title: 'First club dive', text: 'Meet the crew on the beach and get wet.' },
+    ],
+    form: {
+      name: 'Name',
+      email: 'Email',
+      cert: 'Certification',
+      certOptions: ['Not certified yet', 'Open Water', 'Advanced Open Water', 'Rescue Diver', 'Divemaster or instructor'],
+      dives: 'Logged dives',
+      diveOptions: ['0', '1–20', '21–100', '100+'],
+      stay: 'In Tofo as',
+      stayOptions: ['Resident', 'Visitor', 'Planning a trip'],
+      dates: 'Dates, if visiting',
+      datesPlaceholder: 'e.g. 3–17 March',
+      interests: 'Interested in',
+      interestOptions: ['Reef dives', 'Ocean safaris', 'Courses', 'Club nights', 'Beach cleans'],
+      message: 'Anything else?',
+      messagePlaceholder: 'Gear, questions, favourite fish…',
+      whatsapp: 'Send via WhatsApp',
+      emailSend: 'Send via email',
+      privacy:
+        'This site stores nothing. Your message opens in WhatsApp or your email app, and you press send.',
+      intro: 'Hi! I’d like to join Tofo Dive Club.',
+      subject: 'Joining Tofo Dive Club',
+      doneTitle: 'Almost there',
+      doneText: 'Your message is ready in WhatsApp or your email app. Press send there to finish.',
+    },
+  },
+  faq: {
+    kicker: 'FAQ',
+    title: 'Before you get wet',
+    items: [
+      {
+        q: 'Is the club a dive centre?',
+        a: 'No. It’s a community of divers. Boats, guides and instruction come from licensed Tofo dive centres; the club organises, fills the boats and keeps the crew together.',
+      },
+      {
+        q: 'Do I need to be certified?',
+        a: 'Not for ocean safaris, which are snorkel trips. If you want to dive, partner instructors run try dives and courses, and once you’re certified the club finds you buddies.',
+      },
+      {
+        q: 'How warm is the water?',
+        a: 'Around 22 °C in the cooler months (June to September) and up to 28 °C in summer. Most divers wear a 5 mm wetsuit; some switch to 3 mm in summer.',
+      },
+      {
+        q: 'What are the boat launches like?',
+        a: 'Boats launch from the beach through the surf. Expect a bumpy, fun start, hold on when the skipper says so, and listen to the briefing.',
+      },
+      {
+        q: 'How do we behave around whale sharks and mantas?',
+        a: 'Stay at least 3 m from the head and 4 m from the tail, never touch or chase, and no flash. Let the animal decide how close it comes.',
+      },
+      {
+        q: 'How do I get to Tofo?',
+        a: 'Fly into Inhambane (INH), usually via Maputo; Tofo is about half an hour from the airport by road. Plenty of people also drive up the EN1 from Maputo.',
+      },
+    ],
+  },
+  footer: {
+    tagline: 'Community diving on Mozambique’s Manta Coast.',
+    where: 'Praia do Tofo, Inhambane, Mozambique',
+    map: 'Open map',
+    demo: 'Demo site. Copy and contact details are placeholders until the club launches.',
+    photos: 'Photos from Unsplash',
+    icons: 'Icons: Font Awesome Free and line-md',
+    built: 'Built with Astro',
+    top: 'Back to the surface',
+  },
+};
+
+export default en;
+export type Dict = typeof en;

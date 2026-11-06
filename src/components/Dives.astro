@@ -1,0 +1,64 @@
+---
+import { photos, srcset, unsplash, type Lang } from '../config';
+import { t } from '../i18n';
+import { diveCards, weekIcons, depths } from '../data';
+import SectionHead from './SectionHead.astro';
+import Fa from './Fa.astro';
+import Line from './Line.astro';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = t(lang).dives;
+---
+<section class="section dives" id="dives" data-depth={depths.dives} aria-labelledby="dives-title">
+  <div class="container">
+    <SectionHead id="dives" depth={depths.dives} kicker={d.kicker} title={d.title} lead={d.lead} />
+
+    <ul class="cards">
+      {d.cards.map((c) => {
+        const meta = diveCards[c.id];
+        const p = photos[meta.photo];
+        return (
+          <li class="card reveal">
+            <figure class="card-photo">
+              <img
+                src={unsplash(p.id, 600, 0.75)}
+                srcset={srcset(p.id, [400, 600, 900], 0.75)}
+                sizes="(min-width: 1100px) 280px, (min-width: 640px) 45vw, 92vw"
+                alt={c.alt}
+                loading="lazy"
+                decoding="async"
+              />
+            </figure>
+            <div class="card-body">
+              <span class="card-icon"><Fa icon={meta.icon} /></span>
+              <h3>{c.title}</h3>
+              <p>{c.text}</p>
+              <span class="tag">{c.tag}</span>
+            </div>
+          </li>
+        );
+      })}
+    </ul>
+
+    <div class="week reveal">
+      <div class="week-head">
+        <h3><Line name="calendar" /> {d.weekTitle}</h3>
+        <p>{d.weekNote}</p>
+      </div>
+      <ol class="week-list">
+        {d.week.map((w) => (
+          <li>
+            <span class="week-day">{w.day}</span>
+            <span class="week-time">{w.time}</span>
+            <span class="week-what"><Fa icon={weekIcons[w.id]} /> {w.what}</span>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </div>
+  <svg class="thermocline" viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 50c120 22 240 30 360 18S600 20 720 26s240 42 360 40 240-34 360-30v54H0Z" fill="currentColor" opacity=".35" />
+    <path d="M0 62c160 18 300 22 440 8s260-40 400-30 260 44 380 40 160-20 220-22v32H0Z" fill="currentColor" />
+  </svg>
+</section>

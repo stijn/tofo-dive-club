@@ -1,0 +1,65 @@
+---
+import { getRelativeLocaleUrl } from 'astro:i18n';
+import { club, photos, type Lang } from '../config';
+import { t } from '../i18n';
+import Mark from './Mark.astro';
+import Fa from './Fa.astro';
+import Line from './Line.astro';
+import { faWhatsapp, faInstagram, faFacebookF } from '@fortawesome/free-brands-svg-icons';
+import { faEnvelope } from '@fortawesome/free-regular-svg-icons';
+import { faLocationDot } from '@fortawesome/free-solid-svg-icons';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = t(lang);
+const f = d.footer;
+const social = [
+  club.whatsapp && { href: `https://wa.me/${club.whatsapp}`, icon: faWhatsapp, label: 'WhatsApp' },
+  club.email && { href: `mailto:${club.email}`, icon: faEnvelope, label: club.email },
+  club.instagram && { href: club.instagram, icon: faInstagram, label: 'Instagram' },
+  club.facebook && { href: club.facebook, icon: faFacebookF, label: 'Facebook' },
+].filter(Boolean) as { href: string; icon: typeof faWhatsapp; label: string }[];
+const credits = [...new Map(Object.values(photos).map((p) => [p.by, p])).values()];
+---
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <a class="brand" href={getRelativeLocaleUrl(lang, '')} aria-label={d.nav.home}>
+        <Mark />
+        <span class="brand-name">{club.name[lang]}</span>
+      </a>
+      <p>{f.tagline}</p>
+      <p class="footer-where">
+        <Fa icon={faLocationDot} /> {f.where}{' · '}<a href={club.map} rel="noopener">{f.map}</a>
+      </p>
+      {social.length > 0 && (
+        <ul class="social">
+          {social.map((s) => (
+            <li><a href={s.href} rel="noopener" aria-label={s.label}><Fa icon={s.icon} /></a></li>
+          ))}
+        </ul>
+      )}
+    </div>
+
+    <nav class="footer-nav" aria-label="Footer">
+      <ul>
+        <li><a href="#club">{d.nav.club}</a></li>
+        <li><a href="#dives">{d.nav.dives}</a></li>
+        <li><a href="#sites">{d.nav.sites}</a></li>
+        <li><a href="#seasons">{d.nav.seasons}</a></li>
+        <li><a href="#join">{d.nav.join}</a></li>
+        <li><a href="#faq">{d.nav.faq}</a></li>
+      </ul>
+    </nav>
+
+    <div class="footer-meta">
+      <p class="demo-note">{f.demo}</p>
+      <p>
+        {f.photos}:{' '}
+        {credits.map((p, i) => <>{i > 0 && ', '}<a href={p.url} rel="noopener">{p.by}</a></>)}
+      </p>
+      <p>{f.icons} · {f.built}</p>
+      <a class="to-top" href="#top"><Line name="arrow-up" /> {f.top}</a>
+    </div>
+  </div>
+</footer>

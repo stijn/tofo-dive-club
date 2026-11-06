@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://stijn.github.io/tofo-dive-club/sitemap-index.xml

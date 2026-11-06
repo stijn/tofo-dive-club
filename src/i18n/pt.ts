@@ -1,0 +1,245 @@
+// Português (Moçambique). Mesma estrutura que en.ts.
+import type { Dict } from './en';
+
+const pt: Dict = {
+  meta: {
+    title: 'Clube de Mergulho do Tofo · Mergulho em comunidade na Costa das Mantas, Moçambique',
+    description:
+      'Um pequeno clube de mergulho comunitário na Praia do Tofo, Moçambique. Tubarões-baleia, raias-manta e mergulhos de recife com uma equipa fixa. Junte-se aos membros fundadores.',
+    ogAlt: 'Um tubarão-baleia a nadar em água azul com raios de sol por cima',
+  },
+  skip: 'Saltar para o conteúdo',
+  nav: {
+    club: 'O clube',
+    dives: 'Mergulhos',
+    sites: 'Locais',
+    seasons: 'Épocas',
+    faq: 'Perguntas',
+    join: 'Aderir',
+    menu: 'Menu',
+    home: 'Clube de Mergulho do Tofo, início',
+  },
+  lang: { other: 'EN', otherLabel: 'Read in English' },
+  gauge: { label: 'Profundidade' },
+  hero: {
+    place: 'Praia do Tofo · Inhambane · Moçambique',
+    titleStart: 'Um clube de mergulho para a',
+    titleEm: 'Costa das Mantas',
+    lead: 'Tubarões-baleia todo o ano, estações de limpeza de mantas e recifes quentes do Índico. Estamos a criar um pequeno clube comunitário no Tofo, para que tenha sempre um parceiro de mergulho, um lugar no barco e companhia para uma bebida no fim.',
+    primary: 'Junte-se aos fundadores',
+    secondary: 'Ver os locais de mergulho',
+    descend: 'Comece a descida',
+    photoAlt: 'Um tubarão-baleia a nadar em água azul profunda com raios de sol por cima',
+    credit: 'Foto',
+  },
+  stats: [
+    { id: 'sharks', value: 'Todo o ano', label: 'tubarões-baleia ao largo do Tofo' },
+    { id: 'temp', value: '22–28 °C', label: 'temperatura da água ao longo do ano' },
+    { id: 'whales', value: 'Jun–Nov', label: 'época das baleias-jubarte' },
+    { id: 'lang', value: 'EN · PT', label: 'línguas do clube' },
+  ],
+  club: {
+    kicker: 'O clube',
+    title: 'O Tofo já tem bons centros de mergulho. Falta uma equipa.',
+    lead: 'Os visitantes mergulham uma semana e vão-se embora. Os residentes mergulham sozinhos, ou nem mergulham. Um clube resolve isso: datas fixas, parceiros conhecidos e gente que sabe para onde corre a corrente no Manta Reef.',
+    pillars: [
+      {
+        id: 'buddies',
+        title: 'Os mesmos parceiros, todas as semanas',
+        text: 'Mergulhos do clube em dias fixos. Basta aparecer, encontrar o seu parceiro e ir para a água.',
+      },
+      {
+        id: 'boats',
+        title: 'Barcos com centros locais',
+        text: 'Reservamos com centros de mergulho licenciados do Tofo e enchemos o barco juntos, para que as saídas aconteçam mesmo nos meses mais calmos.',
+      },
+      {
+        id: 'learn',
+        title: 'Continuar a aprender',
+        text: 'Revisão de técnicas, noites de identificação de peixes e cursos com instrutores parceiros, do primeiro mergulho até divemaster.',
+      },
+      {
+        id: 'reef',
+        title: 'Retribuir ao recife',
+        text: 'Limpezas de praia e fotos de identificação de mantas e tubarões-baleia partilhadas com os investigadores que os acompanham.',
+      },
+    ],
+    founderTitle: 'Criado pela Isa',
+    founderText:
+      'A Isa vai mudar-se para o Tofo por causa do mergulho e está a criar o clube para que recém-chegados e moradores tenham com quem mergulhar. Ainda é o começo: os primeiros membros decidem como o clube funciona.',
+    photoAlt: 'Um mergulhador a fazer sinais com as mãos debaixo de água',
+    beachAlt: 'Praia do Tofo: uma longa praia de areia com água verde e pessoas a caminhar',
+  },
+  dives: {
+    kicker: 'O que fazemos',
+    title: 'Mergulhos, safaris e noites em terra',
+    lead: 'Cada membro escolhe em que participa. Tudo o que acontece na água é feito com operadores locais licenciados.',
+    cards: [
+      {
+        id: 'reef',
+        title: 'Mergulhos de recife',
+        text: 'Manhãs de dois mergulhos nos recifes ao largo do Tofo, planeadas conforme a maré, a ondulação e quem está na vila.',
+        tag: 'Mergulhadores certificados',
+        alt: 'Um grupo de raias-manta a deslizar por cima de mergulhadores',
+      },
+      {
+        id: 'safari',
+        title: 'Safaris oceânicos',
+        text: 'Saídas de snorkel à procura de tubarões-baleia e golfinhos ao longo da costa. Não é preciso certificação.',
+        tag: 'Todos',
+        alt: 'Um tubarão-baleia visto de cima, perto da superfície',
+      },
+      {
+        id: 'learn',
+        title: 'Batismos e cursos',
+        text: 'Comece com um batismo de mergulho ou vá mais longe com instrutores parceiros. Com parceiros do clube, os primeiros mergulhos no mar assustam menos.',
+        tag: 'Iniciantes',
+        alt: 'Dois mergulhadores junto a um cardume de peixes amarelos',
+      },
+      {
+        id: 'nights',
+        title: 'Noites do clube',
+        text: 'Conversas sobre peixes, troca de fotos, planeamento dos mergulhos da semana e uma bebida ao pôr do sol.',
+        tag: 'Membros',
+        alt: 'Um surfista a caminhar na praia do Tofo ao fim do dia',
+      },
+    ],
+    weekTitle: 'Uma semana tipo do clube',
+    weekNote: 'Horário provisório. Os membros fundadores definem o verdadeiro.',
+    week: [
+      { id: 'sunrise', day: 'Ter', time: '06:30', what: 'Mergulho ao nascer do sol' },
+      { id: 'safari', day: 'Qui', time: '09:00', what: 'Safari oceânico' },
+      { id: 'night', day: 'Sex', time: '18:00', what: 'Noite do clube' },
+      { id: 'double', day: 'Sáb', time: '07:00', what: 'Manhã de dois mergulhos' },
+      { id: 'clean', day: 'Dom', time: '08:00', what: 'Limpeza de praia' },
+    ],
+  },
+  sites: {
+    kicker: 'Locais de mergulho',
+    title: 'Os recifes onde vamos mergulhar',
+    lead: 'Os melhores locais do Tofo ficam a uma curta viagem de barco. Os barcos saem da praia, direto pela rebentação. Alguns favoritos:',
+    note: 'Profundidades aproximadas. O centro de mergulho faz o briefing de cada mergulho.',
+    depth: 'Profundidade',
+    surface: 'Superfície',
+    levels: { all: 'Todos', beginner: 'Para iniciantes', advanced: 'Avançado' },
+    list: [
+      {
+        id: 'safari',
+        name: 'Safari oceânico',
+        text: 'Os tubarões-baleia alimentam-se perto da superfície. Nade ao lado deles num safari guiado.',
+      },
+      {
+        id: 'salon',
+        name: 'Salon',
+        text: 'Mais raso e tranquilo. Bom para o primeiro mergulho no mar ou um mergulho de adaptação.',
+      },
+      {
+        id: 'manta',
+        name: 'Manta Reef',
+        text: 'O mais famoso. Estações de limpeza onde as mantas fazem fila para serem limpas, e grandes cardumes sobre o recife.',
+      },
+      {
+        id: 'office',
+        name: 'The Office',
+        text: 'Um labirinto de ravinas, pináculos e saliências, com muito para explorar num só mergulho.',
+      },
+      {
+        id: 'giants',
+        name: 'Giant’s Castle',
+        text: 'Uma crista funda com saliências e ravinas, e boas hipóteses de ver raias e animais grandes.',
+      },
+    ],
+  },
+  seasons: {
+    kicker: 'Épocas',
+    title: 'O que há na água, mês a mês',
+    lead: 'A vida selvagem não segue horários, mas estes são os padrões habituais ao largo do Tofo.',
+    months: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+    monthsLong: [
+      'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+      'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
+    ],
+    rows: { sharks: 'Tubarões-baleia', mantas: 'Raias-manta', whales: 'Baleias-jubarte', temp: 'Água °C (aprox.)' },
+    legend: { peak: 'Melhores hipóteses', possible: 'Possível', unlikely: 'Pouco provável' },
+    now: 'Agora',
+    caption: 'Vida marinha e temperatura da água por mês ao largo do Tofo',
+    note: 'As jubartes observam-se a partir do barco. Não é permitido nadar com baleias.',
+    photoAlt: 'Uma baleia-jubarte a saltar fora de água',
+  },
+  join: {
+    kicker: 'Aderir',
+    title: 'Torne-se membro fundador',
+    lead: 'Ainda não há quotas. Diga-nos quem é e como gosta de mergulhar, e adicionamo-lo ao grupo do clube quando as primeiras datas estiverem marcadas.',
+    steps: [
+      { id: 'form', title: 'Fale-nos de si', text: 'Preencha o formulário. Leva um minuto.' },
+      { id: 'group', title: 'Entre no grupo', text: 'Adicionamo-lo ao grupo de WhatsApp do clube.' },
+      { id: 'dive', title: 'Primeiro mergulho do clube', text: 'Conheça a equipa na praia e vá para a água.' },
+    ],
+    form: {
+      name: 'Nome',
+      email: 'Email',
+      cert: 'Certificação',
+      certOptions: ['Ainda sem certificação', 'Open Water', 'Advanced Open Water', 'Rescue Diver', 'Divemaster ou instrutor'],
+      dives: 'Mergulhos registados',
+      diveOptions: ['0', '1–20', '21–100', '100+'],
+      stay: 'No Tofo como',
+      stayOptions: ['Residente', 'Visitante', 'A planear uma viagem'],
+      dates: 'Datas, se for visitante',
+      datesPlaceholder: 'ex.: 3–17 de março',
+      interests: 'Interesses',
+      interestOptions: ['Mergulhos de recife', 'Safaris oceânicos', 'Cursos', 'Noites do clube', 'Limpezas de praia'],
+      message: 'Mais alguma coisa?',
+      messagePlaceholder: 'Equipamento, perguntas, peixe favorito…',
+      whatsapp: 'Enviar por WhatsApp',
+      emailSend: 'Enviar por email',
+      privacy:
+        'Este site não guarda nada. A mensagem abre no WhatsApp ou na sua aplicação de email, e é você que carrega em enviar.',
+      intro: 'Olá! Gostaria de aderir ao Clube de Mergulho do Tofo.',
+      subject: 'Adesão ao Clube de Mergulho do Tofo',
+      doneTitle: 'Quase lá',
+      doneText: 'A sua mensagem está pronta no WhatsApp ou na aplicação de email. Carregue em enviar para terminar.',
+    },
+  },
+  faq: {
+    kicker: 'Perguntas',
+    title: 'Antes de se molhar',
+    items: [
+      {
+        q: 'O clube é um centro de mergulho?',
+        a: 'Não. É uma comunidade de mergulhadores. Barcos, guias e formação vêm de centros de mergulho licenciados do Tofo; o clube organiza, enche os barcos e mantém a equipa unida.',
+      },
+      {
+        q: 'Preciso de ter certificação?',
+        a: 'Não para os safaris oceânicos, que são saídas de snorkel. Se quiser mergulhar, os instrutores parceiros fazem batismos e cursos, e depois de certificado o clube arranja-lhe parceiros de mergulho.',
+      },
+      {
+        q: 'Qual é a temperatura da água?',
+        a: 'Cerca de 22 °C nos meses mais frescos (junho a setembro) e até 28 °C no verão. A maioria usa um fato de 5 mm; alguns passam para 3 mm no verão.',
+      },
+      {
+        q: 'Como são as saídas de barco?',
+        a: 'Os barcos saem da praia através da rebentação. Conte com um início agitado e divertido, segure-se quando o timoneiro mandar e ouça bem o briefing.',
+      },
+      {
+        q: 'Como nos comportamos com tubarões-baleia e mantas?',
+        a: 'Fique a pelo menos 3 m da cabeça e 4 m da cauda, nunca toque nem persiga, e nada de flash. Deixe o animal decidir a que distância se aproxima.',
+      },
+      {
+        q: 'Como chego ao Tofo?',
+        a: 'Voe para Inhambane (INH), normalmente via Maputo; o Tofo fica a cerca de meia hora do aeroporto por estrada. Muita gente também sobe de carro pela EN1 a partir de Maputo.',
+      },
+    ],
+  },
+  footer: {
+    tagline: 'Mergulho em comunidade na Costa das Mantas de Moçambique.',
+    where: 'Praia do Tofo, Inhambane, Moçambique',
+    map: 'Abrir mapa',
+    demo: 'Site de demonstração. Textos e contactos são provisórios até ao lançamento do clube.',
+    photos: 'Fotos do Unsplash',
+    icons: 'Ícones: Font Awesome Free e line-md',
+    built: 'Feito com Astro',
+    top: 'Voltar à superfície',
+  },
+};
+
+export default pt;
