@@ -41,7 +41,7 @@ const links = [
       {social.length > 0 && (
         <ul class="social">
           {social.map((s) => (
-            <li><a href={s.href} rel="noopener" aria-label={s.label}><Fa icon={s.icon} /></a></li>
+            <li><a href={s.href} rel="noopener" aria-label={s.label} data-tip={s.label} data-tip-describe="false"><Fa icon={s.icon} /></a></li>
           ))}
         </ul>
       )}

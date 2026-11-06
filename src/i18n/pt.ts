@@ -23,9 +23,11 @@ const pt: Dict = {
     glossary: 'Palavras de mergulho',
     join: 'Aderir',
     menu: 'Menu',
+    menuOpen: 'Abrir menu',
+    menuClose: 'Fechar menu',
     home: 'Clube de Mergulho do Tofo, início',
   },
-  lang: { other: 'EN', otherLabel: 'EN, read in English' },
+  lang: { other: 'EN', otherLabel: 'EN, read in English', tip: 'Read in English' },
   motion: { pause: 'Pausar animações', play: 'Retomar animações' },
   gauge: { label: 'Profundidade' },
   hero: {
@@ -48,7 +50,7 @@ const pt: Dict = {
   ],
   club: {
     kicker: 'O clube',
-    title: 'O Tofo tem bons centros de mergulho. Falta uma equipa.',
+    title: 'O Tofo tem bons centros de mergulho. Falta uma *equipa*.',
     lead: 'Os visitantes mergulham uma semana e vão-se embora. Quem vive cá mergulha muitas vezes sozinho, ou nem mergulha. Um clube resolve isso. Tem dias fixos de mergulho, os mesmos parceiros e gente que conhece bem o Manta Reef.',
     pillars: [
       {
@@ -80,7 +82,7 @@ const pt: Dict = {
   },
   dives: {
     kicker: 'O que fazemos',
-    title: 'Mergulhos, safaris e noites em terra',
+    title: '*Mergulhos*, safaris e noites em terra',
     lead: 'Cada membro escolhe em que participa. Tudo o que acontece na água é feito com centros de mergulho locais licenciados.',
     cards: [
       {
@@ -124,7 +126,7 @@ const pt: Dict = {
   },
   sites: {
     kicker: 'Locais de mergulho',
-    title: 'Os recifes onde vamos mergulhar',
+    title: 'Os *recifes* onde vamos mergulhar',
     lead: 'Os melhores locais do Tofo ficam a uma curta viagem de barco da praia. Os barcos [[g:surf-launch|saem pela rebentação]]. Aqui ficam alguns favoritos:',
     note: 'Profundidades aproximadas. O centro de mergulho faz um [[g:briefing|briefing]] antes de cada mergulho.',
     depth: 'Profundidade',
@@ -161,7 +163,7 @@ const pt: Dict = {
   },
   seasons: {
     kicker: 'Épocas',
-    title: 'O que há na água, mês a mês',
+    title: 'O que há na *água*, mês a mês',
     lead: 'A vida selvagem não segue horários. Mas estes são os padrões habituais ao largo do Tofo.',
     months: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
     monthsLong: [
@@ -178,7 +180,7 @@ const pt: Dict = {
   },
   offer: {
     kicker: 'A oferta',
-    title: 'Membros fundadores',
+    title: 'Membros *fundadores*',
     lead: 'Perguntámos o que corre mal quando se mergulha hoje no Tofo. As saídas são canceladas quando há poucas pessoas. Os preços vêm em três moedas, com extras por cima. E não há nada para quem vive cá. Por isso, esta é a nossa oferta.',
     featured: 'Melhor para quem vive cá',
     plans: [
@@ -240,7 +242,7 @@ const pt: Dict = {
   },
   join: {
     kicker: 'Aderir',
-    title: 'Torne-se membro fundador',
+    title: 'Torne-se *membro fundador*',
     lead: 'Ainda não há quotas. Diga-nos quem é e como gosta de mergulhar. Adicionamo-lo ao grupo do clube quando as primeiras datas estiverem marcadas.',
     steps: [
       { id: 'form', title: 'Fale-nos de si', text: 'Preencha o formulário. Leva um minuto.' },
@@ -282,7 +284,7 @@ const pt: Dict = {
   },
   faq: {
     kicker: 'Perguntas',
-    title: 'Antes de se molhar',
+    title: 'Antes de se *molhar*',
     glossaryLink: 'Novo no mergulho? Veja as palavras de mergulho.',
     items: [
       {
@@ -317,26 +319,31 @@ const pt: Dict = {
   },
   glossary: {
     kicker: 'Palavras de mergulho',
-    title: 'Palavras de mergulho, explicadas',
-    lead: 'O mergulho tem a sua própria linguagem. Eis o que querem dizer as palavras desta página.',
+    title: '*Palavras de mergulho*, explicadas',
+    lead: 'O mergulho tem a sua própria linguagem. Passe o rato ou use Tab numa palavra sublinhada para ver o que quer dizer, ou veja todas aqui.',
     linkHint: 'ver palavras de mergulho',
     abbrTitle: 'Abreviaturas',
+    groups: [
+      { id: 'boat', title: 'No barco' },
+      { id: 'water', title: 'Na água' },
+      { id: 'learn', title: 'Aprender e equipamento' },
+    ],
     terms: [
-      { id: 'briefing', term: 'Briefing', def: 'A conversa antes de um mergulho. Explica o plano, o local, a profundidade e a segurança.' },
-      { id: 'buddy', term: 'Parceiro de mergulho', def: 'A pessoa com quem mergulha. Os parceiros ficam juntos debaixo de água e verificam o ar e o equipamento um do outro.' },
-      { id: 'check-out', term: 'Mergulho de adaptação', def: 'Um primeiro mergulho fácil para testar o equipamento, os pesos e as técnicas antes de mergulhos mais fundos.' },
-      { id: 'cleaning-station', term: 'Estação de limpeza', def: 'Um ponto do recife onde peixes pequenos comem parasitas de animais grandes. As mantas esperam lá para serem limpas, e os mergulhadores podem vê-las.' },
-      { id: 'divemaster', term: 'Divemaster', def: 'O primeiro nível profissional de mergulho. Os divemasters guiam mergulhos e ajudam os instrutores.' },
-      { id: 'fish-id', term: 'Identificação de peixes', def: 'Saber de que espécie é um peixe. Os investigadores também reconhecem cada manta e cada tubarão-baleia pelo padrão das manchas.' },
-      { id: 'ocean-safari', term: 'Safari oceânico', def: 'Uma saída de barco para nadar com tubarões-baleia e outros animais grandes perto da superfície. Não precisa de licença de mergulho.' },
-      { id: 'open-water', term: 'Open Water', def: 'Open Water Diver é o primeiro certificado completo de mergulho. Permite mergulhar até cerca de 18 metros com um parceiro.' },
-      { id: 'safety-stop', term: 'Paragem de segurança', def: 'Uma pausa de cerca de 3 minutos a 5 metros, a caminho da superfície. Ajuda o corpo a libertar o azoto em excesso.' },
-      { id: 'skipper', term: 'Timoneiro', def: 'A pessoa que conduz o barco.' },
-      { id: 'smb', term: 'Boia de superfície (SMB)', def: 'Um tubo cor de laranja que os mergulhadores mandam para a superfície para o barco ver onde estão.' },
-      { id: 'surf-launch', term: 'Saída pela rebentação', def: 'No Tofo não há porto. Os barcos saem da praia e passam pelas ondas.' },
-      { id: 'swell', term: 'Ondulação', def: 'O tamanho das ondas do mar. Com muita ondulação, as saídas de barco podem ser canceladas.' },
-      { id: 'try-dive', term: 'Batismo de mergulho', def: 'Um primeiro mergulho com um instrutor, para quem nunca mergulhou. Não precisa de certificado.' },
-      { id: 'wetsuit', term: 'Fato de mergulho', def: 'Um fato de borracha que mantém o corpo quente na água. Quanto mais grosso (mais milímetros), mais quente.' },
+      { id: 'briefing', group: 'boat', term: 'Briefing', def: 'A conversa antes de um mergulho: o plano, o local, a profundidade e a segurança.' },
+      { id: 'skipper', group: 'boat', term: 'Timoneiro', def: 'A pessoa que conduz o barco.' },
+      { id: 'surf-launch', group: 'boat', term: 'Saída pela rebentação', def: 'O Tofo não tem porto. Os barcos saem da praia, pelas ondas.' },
+      { id: 'swell', group: 'boat', term: 'Ondulação', def: 'O tamanho das ondas. Muita ondulação pode cancelar uma saída.' },
+      { id: 'buddy', group: 'water', term: 'Parceiro de mergulho', def: 'A pessoa com quem mergulha. Ficam juntos e verificam o ar um do outro.' },
+      { id: 'cleaning-station', group: 'water', term: 'Estação de limpeza', def: 'Um ponto do recife onde peixes pequenos limpam animais grandes, como as mantas.' },
+      { id: 'ocean-safari', group: 'water', term: 'Safari oceânico', def: 'Uma saída de barco para nadar com animais grandes. Sem licença de mergulho.' },
+      { id: 'safety-stop', group: 'water', term: 'Paragem de segurança', def: 'Uma pausa de 3 minutos a 5 metros, a caminho da superfície.' },
+      { id: 'smb', group: 'water', term: 'Boia de superfície (SMB)', def: 'Um tubo cor de laranja que mostra ao barco onde está.' },
+      { id: 'try-dive', group: 'learn', term: 'Batismo de mergulho', def: 'Um primeiro mergulho com um instrutor. Sem certificado.' },
+      { id: 'check-out', group: 'learn', term: 'Mergulho de adaptação', def: 'Um primeiro mergulho fácil para testar o equipamento, os pesos e as técnicas.' },
+      { id: 'open-water', group: 'learn', term: 'Open Water', def: 'O primeiro certificado completo. Pode mergulhar até 18 metros com um parceiro.' },
+      { id: 'divemaster', group: 'learn', term: 'Divemaster', def: 'O primeiro nível profissional. Os divemasters guiam mergulhos.' },
+      { id: 'fish-id', group: 'learn', term: 'Identificação de peixes', def: 'Dar nome às espécies que vê.' },
+      { id: 'wetsuit', group: 'learn', term: 'Fato de mergulho', def: 'Um fato de borracha que mantém o corpo quente. Mais grosso é mais quente.' },
     ],
     abbreviations: [
       { id: 'c', short: '°C', title: 'graus Celsius' },
@@ -371,7 +378,7 @@ const pt: Dict = {
   },
   notFound: {
     kicker: '404',
-    title: 'Desceu fundo demais',
+    title: 'Desceu *fundo demais*',
     text: 'Esta página não existe. Verifique o ar, faça sinal de OK e suba devagar.',
     home: 'Subir para a página inicial',
     other: 'English',

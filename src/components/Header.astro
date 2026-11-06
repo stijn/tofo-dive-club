@@ -33,7 +33,7 @@ const links = [
         </ul>
       )}
       <div class="nav-tools">
-        <button class="icon-btn motion-btn" type="button" aria-pressed="false" title={d.motion.pause} data-label-pause={d.motion.pause} data-label-play={d.motion.play} data-motion-btn>
+        <button class="icon-btn motion-btn" type="button" aria-pressed="false" data-tip={d.motion.pause} data-tip-describe="false" data-label-pause={d.motion.pause} data-label-play={d.motion.play} data-motion-btn>
           <span class="visually-hidden">{d.motion.pause}</span>
           <span class="motion-icon motion-icon-pause"><Line name="play-to-pause-transition" /></span>
           <span class="motion-icon motion-icon-play"><Line name="pause-to-play-transition" /></span>
@@ -49,10 +49,12 @@ const links = [
         hreflang={htmlLang[other]}
         lang={htmlLang[other]}
         aria-label={d.lang.otherLabel}
+        data-tip={d.lang.tip}
+        data-tip-describe="false"
         data-lang-switch
       >{d.lang.other}</a>
       {!minimal && (
-        <button class="icon-btn menu-btn" type="button" aria-expanded="false" aria-controls="site-nav" data-menu-btn>
+        <button class="icon-btn menu-btn" type="button" aria-expanded="false" aria-controls="site-nav" data-tip={d.nav.menuOpen} data-tip-describe="false" data-label-open={d.nav.menuOpen} data-label-close={d.nav.menuClose} data-menu-btn>
           <span class="visually-hidden">{d.nav.menu}</span>
           <span class="menu-icon menu-icon-open"><Line name="menu-to-close-transition" /></span>
           <span class="menu-icon menu-icon-closed"><Line name="close-to-menu-transition" /></span>
@@ -64,6 +66,7 @@ const links = [
 
 <script>
   import { setMotion, motionOn } from '../scripts/motion-state';
+  import { setTip } from '../scripts/tooltips';
 
   const header = document.querySelector<HTMLElement>('[data-header]')!;
   const btn = document.querySelector<HTMLButtonElement>('[data-menu-btn]');
@@ -79,6 +82,7 @@ const links = [
     const setOpen = (open: boolean) => {
       btn.setAttribute('aria-expanded', String(open));
       header.classList.toggle('is-open', open);
+      setTip(btn, (open ? btn.dataset.labelClose : btn.dataset.labelOpen)!);
       const icon = btn.querySelector<SVGSVGElement>(open ? '.menu-icon-open svg' : '.menu-icon-closed svg');
       if (motionOn()) icon?.setCurrentTime?.(0);
     };
@@ -98,7 +102,7 @@ const links = [
     const on = motionOn();
     motionBtn.setAttribute('aria-pressed', String(!on));
     const label = on ? labels.pause : labels.play;
-    motionBtn.title = label;
+    setTip(motionBtn, label);
     motionBtn.querySelector('.visually-hidden')!.textContent = label;
   };
   syncMotionBtn();

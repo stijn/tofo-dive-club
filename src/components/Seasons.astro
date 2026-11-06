@@ -2,6 +2,7 @@
 import { photos, srcset, unsplash, type Lang } from '../config';
 import { t } from '../i18n';
 import { rich } from '../lib/rich';
+import { manta } from '../lib/creatures';
 import { seasons, waterTemp, depths } from '../data';
 import SectionHead from './SectionHead.astro';
 import Line from './Line.astro';
@@ -15,7 +16,7 @@ const whale = photos.humpback;
 ---
 <section class="section seasons deep" id="seasons" data-depth={depths.seasons} aria-labelledby="seasons-title">
   <div class="bubbles" aria-hidden="true"></div>
-  <svg class="glider" viewBox="0 0 64 40" aria-hidden="true"><path fill="currentColor" d="M32 6c-5 0-10.5 4-24 9.6 11.5 1.6 18.4 5.6 21.4 10.6.9 1.6 1.7 3.6 2.6 6 .9-2.4 1.7-4.4 2.6-6 3-5 9.9-9 21.4-10.6C42.5 10 37 6 32 6Z"/><path d="M32 31v8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+  <div class="glider" aria-hidden="true" set:html={manta} />
   <div class="container">
     <div class="seasons-top">
       <SectionHead lang={lang} id="seasons" depth={depths.seasons} kicker={d.kicker} title={d.title} lead={d.lead} />
@@ -34,7 +35,7 @@ const whale = photos.humpback;
       </figure>
     </div>
 
-    <div class="season-wrap reveal">
+    <div class="season-wrap reveal" data-season-wrap>
       <table class="season-table">
         <caption class="visually-hidden">{d.caption}</caption>
         <thead>
@@ -50,7 +51,7 @@ const whale = photos.humpback;
         </thead>
         <tbody>
           {rows.map((r) => (
-            <tr>
+            <tr data-row={r.key}>
               <th scope="row">{r.name}</th>
               {r.values.map((v, i) => (
                 <td data-month={i} class={`lvl lvl-${v}`}>
@@ -60,7 +61,7 @@ const whale = photos.humpback;
               ))}
             </tr>
           ))}
-          <tr class="temp-row">
+          <tr class="temp-row" data-row="temp">
             <th scope="row" set:html={rich(d.rows.temp, lang)} />
             {waterTemp.map((c, i) => (
               <td data-month={i} style={`--warm:${(c - 21) / 7}`}><span>{c}</span></td>

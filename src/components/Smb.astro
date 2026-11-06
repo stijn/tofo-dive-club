@@ -9,7 +9,7 @@ interface Props { lang: Lang }
 const { lang } = Astro.props;
 const d = t(lang).smb;
 ---
-<a class="smb-float" href="#top" title={d.hint} data-ascend>
+<a class="smb-float" href="#top" data-tip={d.label} data-tip-side="left" data-tip-describe="false" data-ascend>
   <span class="visually-hidden">{d.label}</span>
   <SmbIcon />
 </a>
@@ -19,7 +19,7 @@ const d = t(lang).smb;
 </div>
 <div class="toast" role="status" data-toast data-message={d.toast}>
   <p data-toast-text></p>
-  <button class="icon-btn toast-close" type="button" data-toast-close>
+  <button class="icon-btn toast-close" type="button" data-tip={d.close} data-tip-describe="false" data-toast-close>
     <span aria-hidden="true">×</span>
     <span class="visually-hidden">{d.close}</span>
   </button>
@@ -28,25 +28,49 @@ const d = t(lang).smb;
 <script>
   import { motionOn } from '../scripts/motion-state';
 
+  const root = document.documentElement;
   const float = document.querySelector<HTMLAnchorElement>('.smb-float')!;
   const stop = document.querySelector<HTMLElement>('[data-safety-stop]')!;
   const count = document.querySelector<HTMLElement>('[data-safety-count]')!;
-  const root = document.documentElement;
-  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-  const onScroll = () => float.classList.toggle('is-visible', window.scrollY > window.innerHeight * 1.2);
+  // Wide screens have room in the margin, so the buoy stays. Narrower screens show it
+  // only while you scroll up, so it never sits on top of text you are reading.
+  const wide = window.matchMedia('(min-width: 1360px)');
+  let lastY = window.scrollY;
+  const onScroll = () => {
+    const y = window.scrollY;
+    const deep = y > window.innerHeight * 1.2;
+    if (!deep) float.classList.remove('is-visible');
+    else if (wide.matches || y < lastY - 4) float.classList.add('is-visible');
+    else if (y > lastY + 4 && !root.dataset.ascending) float.classList.remove('is-visible');
+    lastY = y;
+  };
   onScroll();
   window.addEventListener('scroll', onScroll, { passive: true });
 
-  const arrive = (y: number) =>
+  // Our own frame-by-frame scroll, so the ascent is one continuous, eased glide
+  // (the browser's smooth scroll can't be timed or chained without stutter).
+  const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
+  let cancelled = false;
+  const glide = (to: number, ms: number, ease: (t: number) => number) =>
     new Promise<void>((resolve) => {
+      const from = window.scrollY;
       const start = performance.now();
-      const check = () => {
-        if (Math.abs(window.scrollY - y) < 2 || performance.now() - start > 2500) resolve();
-        else requestAnimationFrame(check);
+      const step = (now: number) => {
+        if (cancelled) return resolve();
+        const t = Math.min(1, (now - start) / ms);
+        window.scrollTo({ top: from + (to - from) * ease(t), behavior: 'instant' as ScrollBehavior });
+        if (t < 1) requestAnimationFrame(step);
+        else resolve();
       };
-      check();
+      requestAnimationFrame(step);
     });
+  const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+  // A visitor who scrolls, swipes or presses a key takes back control.
+  const cancel = () => (cancelled = true);
+  ['wheel', 'touchstart', 'keydown'].forEach((t) => window.addEventListener(t, cancel, { passive: true }));
 
   const focusTop = () => {
     const h1 = document.getElementById('hero-title') ?? document.querySelector('h1');
@@ -63,26 +87,37 @@ const d = t(lang).smb;
       return;
     }
     busy = true;
+    cancelled = false;
     root.dataset.ascending = '1';
+    root.classList.add('is-ascending');
     float.classList.add('is-launching');
 
-    // Safety stop at 5 m: the club section.
+    // Rise to the 5 m safety stop (the club section), ease to a halt, hang there, then surface.
     const club = document.getElementById('club');
     const stopY = club ? Math.max(0, club.offsetTop - 80) : 0;
-    if (club && window.scrollY > stopY + window.innerHeight) {
-      window.scrollTo({ top: stopY, behavior: 'smooth' });
-      await arrive(stopY);
-      stop.classList.add('is-on');
-      for (const n of [3, 2, 1, 0]) {
-        count.textContent = `${n}:00`;
-        await sleep(280);
+    const distance = window.scrollY - stopY;
+    if (club && distance > window.innerHeight) {
+      await glide(stopY, Math.min(1800, 700 + distance * 0.08), easeInOut);
+      if (!cancelled) {
+        stop.classList.add('is-on');
+        const t0 = performance.now();
+        await new Promise<void>((resolve) => {
+          const tick = (now: number) => {
+            const left = Math.max(0, 1 - (now - t0) / 900);
+            count.textContent = `${Math.floor(left * 3)}:${String(Math.floor((left * 180) % 60)).padStart(2, '0')}`;
+            if (left > 0 && !cancelled) requestAnimationFrame(tick);
+            else resolve();
+          };
+          requestAnimationFrame(tick);
+        });
+        await wait(120);
+        stop.classList.remove('is-on');
       }
-      stop.classList.remove('is-on');
     }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    await arrive(0);
-    focusTop();
+    if (!cancelled) await glide(0, Math.min(1000, 500 + window.scrollY * 0.3), easeOut);
+    if (!cancelled) focusTop();
     float.classList.remove('is-launching');
+    root.classList.remove('is-ascending');
     delete root.dataset.ascending;
     busy = false;
   };

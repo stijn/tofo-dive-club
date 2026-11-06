@@ -1,10 +1,13 @@
 ---
-// Glossary of dive jargon and short forms (WCAG 3.1.3 and 3.1.4).
-// Copy links its first use of a term here with [[g:id|text]].
+// Dive words: jargon and short forms (WCAG 3.1.3 and 3.1.4), grouped so it scans.
+// Copy links each term's first use here with [[g:id|text]]; those links also show
+// the definition as a tooltip, so most visitors never need to scroll down.
 import type { Lang } from '../config';
 import { t } from '../i18n';
-import { depths } from '../data';
+import { rich } from '../lib/rich';
+import { depths, termIcons, groupIcons } from '../data';
 import SectionHead from './SectionHead.astro';
+import Fa from './Fa.astro';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -13,16 +16,23 @@ const g = t(lang).glossary;
 <section class="section glossary deep" id="glossary" data-depth={depths.faq} aria-labelledby="glossary-title">
   <div class="container">
     <SectionHead lang={lang} id="glossary" depth={depths.faq} kicker={g.kicker} title={g.title} lead={g.lead} />
-    <dl class="terms">
-      {g.terms.map((term) => (
-        <div class="term-row reveal" id={`g-${term.id}`} tabindex="-1">
-          <dt>{term.term}</dt>
-          <dd>{term.def}</dd>
-        </div>
+    <div class="word-groups">
+      {g.groups.map((group) => (
+        <section class="word-group reveal" aria-labelledby={`wg-${group.id}`}>
+          <h3 id={`wg-${group.id}`}><span class="word-group-icon"><Fa icon={groupIcons[group.id]} /></span> {group.title}</h3>
+          <dl>
+            {g.terms.filter((term) => term.group === group.id).map((term) => (
+              <div class="word" id={`g-${term.id}`} tabindex="-1">
+                <dt><span class="word-icon"><Fa icon={termIcons[term.id]} /></span>{term.term}</dt>
+                <dd>{term.def}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
       ))}
-    </dl>
+    </div>
     <h3 class="abbr-title reveal">{g.abbrTitle}</h3>
-    <dl class="abbrs reveal">
+    <dl class="abbr-chips reveal">
       {g.abbreviations.map((a) => (
         <div>
           <dt><abbr title={a.title}>{a.short}</abbr></dt>

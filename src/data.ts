@@ -4,7 +4,10 @@ import {
   faUserGroup, faShip, faGraduationCap, faHandHoldingHeart, faWater, faFish,
   faTemperatureHalf, faLanguage, faSun, faMoon, faUmbrellaBeach, faFishFins,
   faMugHot, faPersonSwimming, faCalendarCheck, faCoins, faHandshakeAngle,
-  faLifeRing, faShieldHalved, faBinoculars,
+  faLifeRing, faShieldHalved, faBinoculars, faClipboardList, faDharmachakra, faHouseFloodWater,
+  faWaveSquare, faUserGroup as faBuddies, faHandSparkles, faStopwatch, faLocationPin, faPersonSwimming as faSwimmer,
+  faListCheck, faCertificate, faIdBadge, faMagnifyingGlass, faShirt, faShip as faBoat, faWater as faWaves,
+  faGraduationCap as faLearn,
 } from '@fortawesome/free-solid-svg-icons';
 import type { IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import type { PhotoKey } from './config';
@@ -72,3 +75,23 @@ export const promiseIcons: Record<string, IconDefinition> = {
   safety: faShieldHalved,
   respect: faBinoculars,
 };
+
+// Dive words: an icon per term and per group.
+export const termIcons: Record<string, IconDefinition> = {
+  briefing: faClipboardList,
+  skipper: faDharmachakra,
+  'surf-launch': faHouseFloodWater,
+  swell: faWaveSquare,
+  buddy: faBuddies,
+  'cleaning-station': faHandSparkles,
+  'ocean-safari': faBinoculars,
+  'safety-stop': faStopwatch,
+  smb: faLocationPin,
+  'try-dive': faSwimmer,
+  'check-out': faListCheck,
+  'open-water': faCertificate,
+  divemaster: faIdBadge,
+  'fish-id': faMagnifyingGlass,
+  wetsuit: faShirt,
+};
+export const groupIcons: Record<string, IconDefinition> = { boat: faBoat, water: faWaves, learn: faLearn };

@@ -7,6 +7,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import SmbIcon from '../components/SmbIcon.astro';
 import { t } from '../i18n';
+import { rich } from '../lib/rich';
 
 const en = t('en').notFound;
 const pt = t('pt').notFound;
@@ -18,11 +19,11 @@ const pt = t('pt').notFound;
     <div class="container lost-inner">
       <SmbIcon class="lost-smb" />
       <p class="kicker"><span class="kicker-depth">{en.kicker}</span><span>40+ <abbr title="metres">m</abbr></span></p>
-      <h1 id="hero-title" tabindex="-1">{en.title}</h1>
+      <h1 id="hero-title" tabindex="-1" set:html={rich(en.title, 'en')} />
       <p class="lead">{en.text}</p>
       <p><a class="btn btn-coral" href={getRelativeLocaleUrl('en', '')}>{en.home}</a></p>
       <div lang="pt-MZ" class="lost-pt">
-        <h2>{pt.title}</h2>
+        <h2 set:html={rich(pt.title, 'pt')} />
         <p class="lead">{pt.text}</p>
         <p><a class="btn btn-ghost" href={getRelativeLocaleUrl('pt', '')}>{pt.home}</a></p>
       </div>
@@ -32,5 +33,6 @@ const pt = t('pt').notFound;
   <script>
     import '../scripts/motion';
     import '../scripts/treats';
+    import '../scripts/tooltips';
   </script>
 </Base>

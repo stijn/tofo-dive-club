@@ -26,7 +26,10 @@ All of these switch off with the pause button in the header, and are off by defa
 
 - Bubbles rise through the deep sections, and from the cursor.
 - A manta glides past the seasons table; a school of fish rides the wave between light and deep water.
-- The back-to-top button is a surface marker buoy. It launches, makes a short safety stop at 5 m, then surfaces.
+- The section you're in gets a rolling wave under its nav link.
+- Hover over the dive-site chart for a depth probe; rest on a seasons cell for 1.5 seconds and its animal swims by.
+- Underlined dive words show their meaning in a tooltip.
+- The back-to-top button is a surface marker buoy. It glides up, eases into a short safety stop at 5 m, then surfaces.
 - Scroll up too fast and a dive computer-style warning tells you to slow down.
 - Type "manta" anywhere on the page.
 
@@ -40,7 +43,7 @@ The site targets WCAG 2.2 level AAA. Checks run for each release:
 - **Reflow**: no horizontal scroll at 320 px.
 - **Reading level**: Flesch-Kincaid grade about 4 for the English copy.
 
-Run them with `npm run audit` and `npm run audit:targets` while `npm run preview` is running (see [tools/a11y](tools/a11y/README.md)). Automated checks can't prove conformance on their own. A review with screen-reader users is still on the roadmap.
+Run them with `npm run audit`, `npm run audit:targets` and `npm run test:ui` (interactions) while `npm run preview` is running (see [tools/a11y](tools/a11y/README.md)). Automated checks can't prove conformance on their own. A review with screen-reader users is still on the roadmap.
 
 Copy uses a small markup (`src/lib/rich.ts`):
 - `[[g:id|text]]` links a word to its glossary entry.

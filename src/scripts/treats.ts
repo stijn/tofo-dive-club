@@ -1,5 +1,6 @@
 // Small delights. All decorative (aria-hidden), all off when animations are paused.
 import { motionOn } from './motion-state';
+import { manta as mantaSvg } from '../lib/creatures';
 
 const rand = (min: number, max: number) => min + Math.random() * (max - min);
 const finePointer = window.matchMedia('(pointer: fine)').matches;
@@ -50,7 +51,7 @@ if (finePointer) {
 }
 
 // 3. A manta glides past the seasons table when it comes into view ----
-const glider = document.querySelector<SVGElement>('.glider');
+const glider = document.querySelector<HTMLElement>('.glider');
 if (glider && 'IntersectionObserver' in window) {
   let lastGlide = 0;
   new IntersectionObserver(
@@ -66,8 +67,6 @@ if (glider && 'IntersectionObserver' in window) {
 }
 
 // 4. Easter egg: type "manta" anywhere --------------------------------
-const mantaSvg =
-  '<svg viewBox="0 0 64 40" aria-hidden="true"><path fill="currentColor" d="M32 6c-5 0-10.5 4-24 9.6 11.5 1.6 18.4 5.6 21.4 10.6.9 1.6 1.7 3.6 2.6 6 .9-2.4 1.7-4.4 2.6-6 3-5 9.9-9 21.4-10.6C42.5 10 37 6 32 6Z"/><path d="M32 31v8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>';
 let typed = '';
 document.addEventListener('keydown', (e) => {
   const target = e.target instanceof Element ? e.target : null;

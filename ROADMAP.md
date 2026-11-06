@@ -15,6 +15,17 @@ Every change to the site is logged here, newest first. Add to it in the same com
 - Accessibility check with real screen-reader users (VoiceOver, TalkBack, NVDA), beyond the automated AAA audit.
 - Own domain.
 
+## 0.3.0 · 2026-11-06
+
+- **Swimmers face forward**: the fish school and every manta (the gliding one, the "manta" easter egg) now face the way they swim; mantas flap their wings up and down.
+- **Smooth ascent**: the buoy now glides up frame by frame with easing, eases into the 5 m safety stop, and surfaces in about 3.5 seconds. Scrolling or pressing a key takes back control. Below 1360 px the buoy only shows while you scroll up, so it never covers text you're reading.
+- **Wavy nav underline**: the section you're in gets a coral wave that draws in and keeps rolling slowly; hovering previews it.
+- **Tooltips**: one accessible tooltip (hover or keyboard focus, Escape to dismiss, hoverable) for the pause, language, menu and buoy buttons, and for every dive word in the copy, which now shows its meaning in place.
+- **Duotone headings**: one keyword per section heading in italic accent colour (teal on sand, sun on deep water), all still AAA.
+- **Charts react to the cursor**: a depth probe follows the pointer over the dive-site chart and lights up the sites at that depth; the seasons table gets a crosshair, and resting on a cell for 1.5 seconds sends its animal past (whale shark, manta, humpback fluke, fish) or a few bubbles when nothing is around.
+- **Dive words redesign**: three grouped cards (on the boat, in the water, learning and kit) with an icon per word, definitions cut to one line, and short forms as chips.
+- **Tests**: `npm run test:ui` checks tooltips, pause, depth probe, animals, form, easter egg and that the ascent only ever moves up without jumps.
+
 ## 0.2.0 · 2026-11-06
 
 - **Roadmap** renamed to `ROADMAP.md` and kept as a log of every update.

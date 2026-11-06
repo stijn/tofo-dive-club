@@ -23,9 +23,11 @@ const en = {
     glossary: 'Dive words',
     join: 'Join',
     menu: 'Menu',
+    menuOpen: 'Open menu',
+    menuClose: 'Close menu',
     home: 'Tofo Dive Club, home',
   },
-  lang: { other: 'PT', otherLabel: 'PT, ler em português' },
+  lang: { other: 'PT', otherLabel: 'PT, ler em português', tip: 'Ler em português' },
   motion: { pause: 'Pause animations', play: 'Play animations' },
   gauge: { label: 'Depth' },
   hero: {
@@ -48,7 +50,7 @@ const en = {
   ],
   club: {
     kicker: 'The club',
-    title: 'Tofo has good dive centres. What it lacks is a crew.',
+    title: 'Tofo has good dive centres. What it lacks is a *crew*.',
     lead: 'Visitors dive for a week, then leave. People who live here often dive alone, or not at all. A club fixes that. You get fixed dive days, the same buddies, and people who know Manta Reef well.',
     pillars: [
       {
@@ -80,7 +82,7 @@ const en = {
   },
   dives: {
     kicker: 'What we do',
-    title: 'Dives, safaris and evenings ashore',
+    title: '*Dives*, safaris and evenings ashore',
     lead: 'Members choose what they join. Everything on the water runs with licensed local dive centres.',
     cards: [
       {
@@ -124,7 +126,7 @@ const en = {
   },
   sites: {
     kicker: 'Dive sites',
-    title: 'The reefs we’ll dive',
+    title: 'The *reefs* we’ll dive',
     lead: 'Tofo’s best sites are a short boat ride from the beach. The boats [[g:surf-launch|launch through the surf]]. Here are a few favourites:',
     note: 'Depths are approximate. Your dive centre gives a [[g:briefing|briefing]] before every dive.',
     depth: 'Depth',
@@ -161,7 +163,7 @@ const en = {
   },
   seasons: {
     kicker: 'Seasons',
-    title: 'What’s in the water, month by month',
+    title: 'What’s in the *water*, month by month',
     lead: 'Wildlife keeps no timetable. But these are the usual patterns off Tofo.',
     months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
     monthsLong: [
@@ -178,7 +180,7 @@ const en = {
   },
   offer: {
     kicker: 'The offer',
-    title: 'Founding membership',
+    title: '*Founding* membership',
     lead: 'We asked what goes wrong when you dive in Tofo today. Trips get cancelled when too few people sign up. Prices come in three currencies, with extras on top. And there is nothing for people who live here. So this is our offer.',
     featured: 'Best for locals',
     plans: [
@@ -240,7 +242,7 @@ const en = {
   },
   join: {
     kicker: 'Join',
-    title: 'Become a founding member',
+    title: 'Become a *founding member*',
     lead: 'There is no fee yet. Tell us who you are and how you like to dive. We will add you to the club group when the first dates are set.',
     steps: [
       { id: 'form', title: 'Tell us about you', text: 'Fill in the form. It takes a minute.' },
@@ -282,7 +284,7 @@ const en = {
   },
   faq: {
     kicker: 'Questions',
-    title: 'Before you get wet',
+    title: 'Before you get *wet*',
     glossaryLink: 'New to diving? See the dive words.',
     items: [
       {
@@ -317,26 +319,31 @@ const en = {
   },
   glossary: {
     kicker: 'Dive words',
-    title: 'Dive words, explained',
-    lead: 'Diving has its own language. Here is what the words on this page mean.',
+    title: '*Dive words*, explained',
+    lead: 'Diving has its own language. Hover over or tab to any underlined word on the page to see what it means, or browse them all here.',
     linkHint: 'see dive words',
     abbrTitle: 'Short forms',
+    groups: [
+      { id: 'boat', title: 'On the boat' },
+      { id: 'water', title: 'In the water' },
+      { id: 'learn', title: 'Learning and kit' },
+    ],
     terms: [
-      { id: 'briefing', term: 'Briefing', def: 'The talk before a dive. It covers the plan, the site, the depth and safety.' },
-      { id: 'buddy', term: 'Buddy', def: 'Your dive partner. Buddies stay together underwater and check each other’s air and gear.' },
-      { id: 'check-out', term: 'Check-out dive', def: 'An easy first dive to test your gear, weights and skills before deeper dives.' },
-      { id: 'cleaning-station', term: 'Cleaning station', def: 'A spot on the reef where small fish eat parasites off big animals. Mantas wait there to be cleaned, so divers can watch them.' },
-      { id: 'divemaster', term: 'Divemaster', def: 'The first professional diving level. Divemasters guide dives and help instructors.' },
-      { id: 'fish-id', term: 'Fish ID', def: 'Knowing which species a fish is. ID is short for identification. Researchers also identify single mantas and whale sharks by their spot patterns.' },
-      { id: 'ocean-safari', term: 'Ocean safari', def: 'A boat trip to snorkel with whale sharks and other big animals near the surface. No diving licence needed.' },
-      { id: 'open-water', term: 'Open Water', def: 'Open Water Diver is the first full diving certificate. It lets you dive to about 18 metres with a buddy.' },
-      { id: 'safety-stop', term: 'Safety stop', def: 'A pause of about 3 minutes at 5 metres on the way up. It helps your body get rid of extra nitrogen.' },
-      { id: 'skipper', term: 'Skipper', def: 'The person who drives the boat.' },
-      { id: 'smb', term: 'SMB', def: 'Surface marker buoy. An orange tube that divers send up to the surface so the boat can see where they are.' },
-      { id: 'surf-launch', term: 'Surf launch', def: 'In Tofo there is no harbour. The boats leave from the beach and drive out through the waves.' },
-      { id: 'swell', term: 'Swell', def: 'The size of the ocean waves. Big swell can make boat trips cancel.' },
-      { id: 'try-dive', term: 'Try dive', def: 'A first dive with an instructor, for people who have never dived. You don’t need a certificate.' },
-      { id: 'wetsuit', term: 'Wetsuit', def: 'A rubber suit that keeps you warm in the water. A thicker suit (more millimetres) is warmer.' },
+      { id: 'briefing', group: 'boat', term: 'Briefing', def: 'The talk before a dive: the plan, the site, the depth and safety.' },
+      { id: 'skipper', group: 'boat', term: 'Skipper', def: 'The person who drives the boat.' },
+      { id: 'surf-launch', group: 'boat', term: 'Surf launch', def: 'Tofo has no harbour. Boats leave from the beach, through the waves.' },
+      { id: 'swell', group: 'boat', term: 'Swell', def: 'The size of the ocean waves. Big swell can cancel a trip.' },
+      { id: 'buddy', group: 'water', term: 'Buddy', def: 'Your dive partner. You stay together and check each other’s air.' },
+      { id: 'cleaning-station', group: 'water', term: 'Cleaning station', def: 'A reef spot where small fish clean big animals, like mantas.' },
+      { id: 'ocean-safari', group: 'water', term: 'Ocean safari', def: 'A boat trip to snorkel with big animals. No diving licence needed.' },
+      { id: 'safety-stop', group: 'water', term: 'Safety stop', def: 'A 3-minute pause at 5 metres on the way up.' },
+      { id: 'smb', group: 'water', term: 'SMB', def: 'Surface marker buoy: an orange tube that shows the boat where you are.' },
+      { id: 'try-dive', group: 'learn', term: 'Try dive', def: 'A first dive with an instructor. No certificate needed.' },
+      { id: 'check-out', group: 'learn', term: 'Check-out dive', def: 'An easy first dive to test your gear, weights and skills.' },
+      { id: 'open-water', group: 'learn', term: 'Open Water', def: 'The first full diving certificate. You can dive to 18 metres with a buddy.' },
+      { id: 'divemaster', group: 'learn', term: 'Divemaster', def: 'The first professional level. Divemasters guide dives.' },
+      { id: 'fish-id', group: 'learn', term: 'Fish ID', def: 'Naming the species you see. ID is short for identification.' },
+      { id: 'wetsuit', group: 'learn', term: 'Wetsuit', def: 'A rubber suit that keeps you warm. Thicker is warmer.' },
     ],
     abbreviations: [
       { id: 'c', short: '°C', title: 'degrees Celsius' },
@@ -371,7 +378,7 @@ const en = {
   },
   notFound: {
     kicker: '404',
-    title: 'You went too deep',
+    title: 'You went *too deep*',
     text: 'This page does not exist. Check your air, signal OK, and head back up slowly.',
     home: 'Ascend to the home page',
     other: 'Português',

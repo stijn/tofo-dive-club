@@ -10,18 +10,21 @@ const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
 export function rich(text: string, lang: Lang): string {
   const d = t(lang);
   const abbr = Object.fromEntries(d.glossary.abbreviations.map((a) => [a.id, a.title]));
-  return esc(text).replace(/\[\[(g|a):([\w-]+)\|([^\]]+)\]\]/g, (_, kind: string, id: string, label: string) => {
+  return esc(text)
+    .replace(/\*([^*]+)\*/g, '<em class="kw">$1</em>')
+    .replace(/\[\[(g|a):([\w-]+)\|([^\]]+)\]\]/g, (_, kind: string, id: string, label: string) => {
     if (kind === 'a') {
       const title = abbr[id];
       if (!title) throw new Error(`Unknown abbreviation "${id}" in ${lang} copy`);
       return `<abbr title="${esc(title)}">${label}</abbr>`;
     }
-    if (!d.glossary.terms.some((term) => term.id === id)) throw new Error(`Unknown glossary term "${id}" in ${lang} copy`);
-    return `<a class="term" href="#g-${id}">${label}<span class="visually-hidden"> (${esc(d.glossary.linkHint)})</span></a>`;
+    const term = d.glossary.terms.find((t) => t.id === id);
+    if (!term) throw new Error(`Unknown glossary term "${id}" in ${lang} copy`);
+    return `<a class="term" href="#g-${id}" data-tip="${esc(term.def)}" data-tip-title="${esc(term.term)}">${label}<span class="visually-hidden"> (${esc(d.glossary.linkHint)})</span></a>`;
   });
 }
 
 /** Strip the markup, for meta tags and structured data. */
 export function plain(text: string): string {
-  return text.replace(/\[\[(?:g|a):[\w-]+\|([^\]]+)\]\]/g, '$1');
+  return text.replace(/\[\[(?:g|a):[\w-]+\|([^\]]+)\]\]/g, '$1').replace(/\*([^*]+)\*/g, '$1');
 }
