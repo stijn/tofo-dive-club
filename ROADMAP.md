@@ -14,7 +14,32 @@ Every change to the site is logged here, newest first. Add to it in the same com
 - Portuguese copy reviewed by a Mozambican speaker.
 - Accessibility check with real screen-reader users (VoiceOver, TalkBack, NVDA), beyond the automated AAA audit.
 - Own domain.
-- A third language once the join form's "preferred language" answers show demand. French or German are the likeliest; the language switch would then become a small menu.
+- **Gitonga translation** by a native speaker: send them [the sheet](https://stijn.github.io/tofo-dive-club/translations/gitonga.csv), then `npm run i18n:import` (see [translations/README.md](translations/README.md)). At 100% the Gitonga version goes live by itself. Then add a Gitonga share image.
+- Another language (French or German are the likeliest) once the join form's "preferred language" answers show demand.
+- Club photos: replace the masters in `src/assets/photos/` (same file names) and update the credits.
+
+## 0.5.0 · 2026-11-07
+
+Built for patchy mobile data. Measured on a throttled slow 3G phone connection (400 kbit/s, 400 ms), first visit, against 0.4.1:
+
+| | 0.4.1 | 0.5.0 |
+| --- | --- | --- |
+| Text on screen | 2.6 s | 1.0 s |
+| Whole page, scrolled to the bottom | 996 KB | 635 KB |
+| Photos | 652 KB | 284 KB |
+| With data saver on | – | 61 KB |
+| Second visit | from the network | 0 KB, opens instantly, also offline |
+
+- **Gitonga version** at `/toh/`, ready for a translator. I couldn't find a Gitonga dictionary good enough to publish from (Glosbe's English–Gitonga dictionary is empty), so the page shows Portuguese until a Gitonga speaker fills in the translation sheet. Until then it's not in the menu, search results or sitemap, and its pages say `lang="pt-MZ"`. The sheet is built from the live copy (361 texts) and opens in Excel or Google Sheets; `npm run i18n:import` brings it back and checks the markup. At 100% Gitonga goes live by itself: footer language list, `lang="toh"`, hreflang and sitemap.
+- **Works offline after one visit**: a service worker keeps the page on the phone. Later visits show the saved copy at once and update in the background; with no signal at all, the saved copy is what you get, with a "No signal" note. Nothing is downloaded just to fill the cache: files the page already loaded are copied from the browser's cache. The join form still works offline, because WhatsApp sends the message when the signal is back, and the form says so.
+- **Data saver mode**: a feather button next to the pause button. It's on by itself when the phone's data saver is on or the connection is 2G. Photos then load only when tapped ("Show photo · 22 KB", the size this phone would download), and the phone's own fonts are used.
+- **Blurred photo previews**: each photo starts as a tiny blurred version built into the page, then fades in. A photo that fails keeps its preview, gets a "Try again" button, and retries by itself when the signal comes back.
+- **Photos served from the site** as AVIF and WebP, sized for common phone screens, instead of hotlinked from Unsplash. That saves a second connection, and the photos are about 30% smaller at the same quality (compared side by side at full size).
+- **Stylesheet inside the page**, so text appears after one download instead of two. The hero now fades in with CSS alone, so a slow script never holds it back.
+- **Lighter on cheap phones**: looping animations pause while their section is off-screen.
+- **Smaller link previews**: the WhatsApp and Facebook share image went from 205 KB (PNG) to about 50 KB (JPEG).
+- **Footer language list**, and web manifests built from the copy, one per language.
+- **Tests**: `npm run test:ui` now also checks self-hosted photos, previews, data saver, failed photos, offline, and the Gitonga page and sheet. `npm run audit` covers the Gitonga page and data saver mode. `npm run perf` measures a page on throttled slow 3G.
 
 ## 0.4.1 · 2026-11-07
 
@@ -101,4 +126,6 @@ First MVP, live as a demo on GitHub Pages.
 - Online booking and payments: dives are run and sold by licensed dive centres, not the club.
 - Naming or comparing competitors on the site: the market scan stays private; the site only states what the club promises.
 - A CMS or backend: the content changes rarely, and editing two TypeScript files is enough for now.
-- More languages: English and Portuguese cover visitors and locals.
+- Trimming the fonts (fixing Fraunces' unused axes, about 130 KB less): not chosen for now, so the fonts stay as designed. Fonts are now the largest part of a first visit; data saver mode skips them.
+- Reusing repeated icons through an SVG sprite: measured at 1.5 KB saved after compression, not worth the extra code.
+- Moving hosting from GitHub Pages (to Cloudflare Pages, for Brotli and HTTP/3): not now. With offline saving the host matters less. Revisit with the club's own domain.

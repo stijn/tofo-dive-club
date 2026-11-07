@@ -4,6 +4,9 @@
 
 const en = {
   meta: {
+    siteName: 'Tofo Dive Club',
+    shortName: 'Tofo Dive',
+    appDescription: 'Community dive club in Praia do Tofo, Mozambique.',
     title: 'Tofo Dive Club · Community diving in Tofo, Mozambique',
     description:
       'A community dive club in Praia do Tofo, Mozambique. Whale sharks, manta rays and reef dives with a regular crew. Join the founding members.',
@@ -29,6 +32,16 @@ const en = {
   },
   lang: { other: 'PT', otherLabel: 'PT, ler em português', tip: 'Ler em português' },
   motion: { pause: 'Pause animations', play: 'Play animations' },
+  data: {
+    label: 'Save data',
+    tipOff: 'Save data: photos load only when you tap them',
+    tipOn: 'Saving data. Tap to load all photos',
+    show: 'Show photo',
+    failed: 'The photo didn’t load.',
+    retry: 'Try again',
+    offline: 'No signal. You’re reading the copy saved on this phone.',
+    offlineForm: 'No signal right now. WhatsApp keeps your message and sends it when you’re back online.',
+  },
   gauge: { label: 'Depth' },
   hero: {
     place: 'Praia do Tofo · Inhambane · Mozambique',
@@ -379,6 +392,7 @@ const en = {
     icons: 'Icons: Font Awesome Free and line-md',
     built: 'Built with Astro',
     top: 'Back to the surface',
+    languages: 'Languages',
   },
   notFound: {
     kicker: '404',

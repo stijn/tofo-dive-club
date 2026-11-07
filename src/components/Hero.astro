@@ -1,5 +1,7 @@
 ---
-import { photos, srcset, unsplash, type Lang } from '../config';
+import { photos, type Lang } from '../config';
+import Photo from './Photo.astro';
+import { heroWidths } from '../lib/photo';
 import { t } from '../i18n';
 import { rich } from '../lib/rich';
 import Line from './Line.astro';
@@ -12,29 +14,19 @@ const d = t(lang);
 const p = photos.heroWhaleShark;
 ---
 <section class="hero" id="top" data-depth={depths.hero} aria-labelledby="hero-title">
-  <img
-    class="hero-img"
-    src={unsplash(p.id, 1600)}
-    srcset={srcset(p.id, [640, 960, 1280, 1600, 2000, 2560])}
-    sizes="100vw"
-    width="1600"
-    height="1067"
-    alt={d.hero.photoAlt}
-    fetchpriority="high"
-    decoding="async"
-  />
+  <Photo class="hero-img" photo="heroWhaleShark" widths={heroWidths} sizes="100vw" alt={d.hero.photoAlt} position="62% 50%" priority noButton />
   <div class="hero-caustics" aria-hidden="true"></div>
   <div class="hero-shade" aria-hidden="true"></div>
   <div class="container hero-inner">
-    <p class="hero-place reveal">
+    <p class="hero-place rise">
       <Line name="map-marker-alt-loop" />
       {d.hero.place}
     </p>
-    <h1 class="hero-title reveal" id="hero-title" tabindex="-1">
+    <h1 class="hero-title rise" id="hero-title" tabindex="-1" style="--d:80ms">
       {d.hero.titleStart} <em>{d.hero.titleEm}</em>
     </h1>
-    <p class="hero-lead reveal" set:html={rich(d.hero.lead, lang)} />
-    <div class="hero-actions reveal">
+    <p class="hero-lead rise" style="--d:160ms" set:html={rich(d.hero.lead, lang)} />
+    <div class="hero-actions rise" style="--d:240ms">
       <a class="btn btn-coral btn-bubbles" href="#join">
         {d.hero.primary}
         <Line name="arrow-right" />

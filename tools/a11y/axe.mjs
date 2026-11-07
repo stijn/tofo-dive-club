@@ -1,5 +1,6 @@
 // Run axe-core (all WCAG A/AA/AAA rules) against pages in headless Chrome.
 // usage: node axe.mjs <axe.min.js path> <width> <url> [url...]
+// SAVE_DATA=1 audits with data saver mode on (photos replaced by "Show photo" buttons).
 import { spawn } from 'node:child_process';
 import { readFileSync, mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -28,10 +29,10 @@ for (const url of urls) {
   await send('Page.navigate', { url });
   await sleep(2500);
   // Audit the settled page: animations paused, everything revealed, lazy images loaded.
-  await evaluate(`localStorage.setItem('tdc-motion','off'); 1`);
+  await evaluate(`localStorage.setItem('tdc-motion','off'); ${process.env.SAVE_DATA ? "localStorage.setItem('tdc-data','save');" : ''} 1`);
   await send('Page.reload');
   await sleep(3000);
-  await evaluate(`document.querySelectorAll('img[loading=lazy]').forEach(i=>i.loading='eager'); 1`);
+  if (!process.env.SAVE_DATA) await evaluate(`document.querySelectorAll('img[loading=lazy]').forEach(i=>i.loading='eager'); 1`);
   await sleep(1500);
   await evaluate(axeSrc + '; 1');
   const res = await evaluate(`(async () => {

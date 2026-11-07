@@ -1,9 +1,11 @@
 ---
 import { getRelativeLocaleUrl } from 'astro:i18n';
-import { club, htmlLang, type Lang } from '../config';
+import { htmlLang, type Lang } from '../config';
 import { t } from '../i18n';
 import Mark from './Mark.astro';
 import Line from './Line.astro';
+import Fa from './Fa.astro';
+import { faFeather } from '@fortawesome/free-solid-svg-icons';
 
 interface Props { lang: Lang; minimal?: boolean }
 const { lang, minimal = false } = Astro.props;
@@ -23,7 +25,7 @@ const links = [
   <div class="container header-bar">
     <a class="brand" href={home} aria-label={d.nav.home} data-brand>
       <Mark />
-      <span class="brand-name">{club.name[lang]}</span>
+      <span class="brand-name">{d.meta.siteName}</span>
     </a>
 
     <nav class="nav" id="site-nav" aria-label={d.nav.label}>
@@ -33,6 +35,21 @@ const links = [
         </ul>
       )}
       <div class="nav-tools">
+        <button
+          class="icon-btn data-btn"
+          type="button"
+          aria-pressed="false"
+          data-tip={d.data.tipOff}
+          data-tip-on={d.data.tipOn}
+          data-tip-off={d.data.tipOff}
+          data-show={d.data.show}
+          data-failed={d.data.failed}
+          data-retry={d.data.retry}
+          data-data-btn
+        >
+          <span class="visually-hidden">{d.data.label}</span>
+          <Fa icon={faFeather} />
+        </button>
         <button class="icon-btn motion-btn" type="button" aria-pressed="false" data-tip={d.motion.pause} data-tip-describe="false" data-label-pause={d.motion.pause} data-label-play={d.motion.play} data-motion-btn>
           <span class="visually-hidden">{d.motion.pause}</span>
           <span class="motion-icon motion-icon-pause"><Line name="play-to-pause-transition" /></span>
@@ -67,6 +84,7 @@ const links = [
 <script>
   import { setMotion, motionOn } from '../scripts/motion-state';
   import { setTip } from '../scripts/tooltips';
+  import '../scripts/data-saver';
 
   const header = document.querySelector<HTMLElement>('[data-header]')!;
   const btn = document.querySelector<HTMLButtonElement>('[data-menu-btn]');

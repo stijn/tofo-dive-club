@@ -1,6 +1,6 @@
 ---
 import { getRelativeLocaleUrl } from 'astro:i18n';
-import { club, photos, type Lang } from '../config';
+import { club, photos, langs, langNames, htmlLang, type Lang } from '../config';
 import { t } from '../i18n';
 import Mark from './Mark.astro';
 import Fa from './Fa.astro';
@@ -21,6 +21,8 @@ const social = [
 ].filter(Boolean) as { href: string; icon: typeof faWhatsapp; label: string }[];
 const credits = [...new Map(Object.values(photos).map((p) => [p.by, p])).values()];
 const home = getRelativeLocaleUrl(lang, '');
+// Every finished language, plus this page's own if it's still being translated.
+const languageList = langs.includes(lang) ? langs : [...langs, lang];
 const links = [
   ['club', d.nav.club], ['dives', d.nav.dives], ['sites', d.nav.sites], ['seasons', d.nav.seasons],
   ['offer', d.nav.offer], ['join', d.nav.join], ['faq', d.nav.faq], ['glossary', d.nav.glossary],
@@ -31,7 +33,7 @@ const links = [
     <div class="footer-brand">
       <a class="brand" href={home} aria-label={d.nav.home}>
         <Mark />
-        <span class="brand-name">{club.name[lang]}</span>
+        <span class="brand-name">{d.meta.siteName}</span>
       </a>
       <p>{f.tagline}</p>
       <address class="footer-where">
@@ -56,6 +58,15 @@ const links = [
     )}
 
     <div class="footer-meta">
+      <nav class="footer-langs" aria-label={f.languages}>
+        <ul>
+          {languageList.map((l) => (
+            <li>
+              <a href={getRelativeLocaleUrl(l, '')} lang={htmlLang[l]} hreflang={htmlLang[l]} aria-current={l === lang ? 'page' : undefined}>{langNames[l]}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
       <p class="demo-note">{f.demo}</p>
       <p>
         {f.photos}:{' '}

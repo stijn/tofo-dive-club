@@ -6,8 +6,9 @@ import '../styles/global.css';
 import frauncesUrl from '@fontsource-variable/fraunces/files/fraunces-latin-full-normal.woff2?url';
 import manropeUrl from '@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2?url';
 import { getAbsoluteLocaleUrl } from 'astro:i18n';
-import { htmlLang, photos, srcset, langs, type Lang } from '../config';
+import { htmlLang, langs, listed, ogLocale, type Lang } from '../config';
 import { t } from '../i18n';
+import { photoSet, heroWidths } from '../lib/photo';
 
 interface Props {
   lang: Lang;
@@ -18,15 +19,26 @@ interface Props {
   noindex?: boolean;
   preloadHero?: boolean;
 }
-const { lang, title, description, path = '', noindex = false, preloadHero = false } = Astro.props;
+const { lang, title, description, path = '', noindex: noindexProp = false, preloadHero = false } = Astro.props;
+// A language that isn't finished yet (Gitonga) stays out of search results.
+const noindex = noindexProp || !listed(lang);
 const d = t(lang);
 const pageTitle = title ?? d.meta.title;
 const pageDescription = description ?? d.meta.description;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const site = Astro.site!.origin;
 const canonical = getAbsoluteLocaleUrl(lang, path);
-const ogImage = `${site}${base}/og/og-${lang}.png`;
-const hero = photos.heroWhaleShark;
+// Gitonga shares the Portuguese preview image until it has its own.
+const ogImage = `${site}${base}/og/og-${lang === 'toh' ? 'pt' : lang}.jpg`;
+// Preloads go in from the head script, so data saver mode can skip them.
+const preloads: Record<string, string>[] = [
+  { rel: 'preload', as: 'font', type: 'font/woff2', crossorigin: 'anonymous', href: frauncesUrl },
+  { rel: 'preload', as: 'font', type: 'font/woff2', crossorigin: 'anonymous', href: manropeUrl },
+];
+if (preloadHero) {
+  const hero = await photoSet('heroWhaleShark', heroWidths);
+  preloads.push({ rel: 'preload', as: 'image', type: hero.preload.type, imagesrcset: hero.preload.srcset, imagesizes: '100vw', fetchpriority: 'high' });
+}
 ---
 <!doctype html>
 <html lang={htmlLang[lang]} dir="ltr">
@@ -35,14 +47,29 @@ const hero = photos.heroWhaleShark;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{pageTitle}</title>
     <meta name="description" content={pageDescription} />
-    <script is:inline>
+    <script is:inline define:vars={{ preloads }}>
+      var r = document.documentElement, s = null, d = null, c = navigator.connection;
+      try { s = localStorage.getItem('tdc-motion'); d = localStorage.getItem('tdc-data'); } catch (e) {}
       // Animations follow the saved choice, else the system's reduce-motion setting.
-      (function () {
-        var r = document.documentElement, s = null;
-        try { s = localStorage.getItem('tdc-motion'); } catch (e) {}
-        var off = s ? s === 'off' : matchMedia('(prefers-reduced-motion: reduce)').matches;
-        r.classList.add(off ? 'motion-off' : 'js-motion');
-      })();
+      var off = s ? s === 'off' : matchMedia('(prefers-reduced-motion: reduce)').matches;
+      r.classList.add('js', off ? 'motion-off' : 'js-motion');
+      // Data saver follows the saved choice, else the phone: its data saver, or a 2G connection.
+      var save = d ? d === 'save' : !!(c && (c.saveData || /2g$/.test(c.effectiveType || '')));
+      if (save) r.classList.add('save-data', 'save-fonts');
+      else preloads.forEach(function (p) {
+        var l = document.createElement('link');
+        for (var k in p) l.setAttribute(k, p[k]);
+        document.head.appendChild(l);
+      });
+      // Photos fade in over their blurred preview once they arrive. A photo that fails
+      // keeps its preview and gets a "Try again" button (load events don't bubble: capture).
+      document.addEventListener('load', function (e) {
+        if (e.target.tagName === 'IMG') e.target.classList.add('is-loaded');
+      }, true);
+      document.addEventListener('error', function (e) {
+        var p = e.target.tagName === 'IMG' && e.target.closest('[data-ph]');
+        if (p) p.classList.add('is-failed');
+      }, true);
     </script>
     {noindex ? (
       <meta name="robots" content="noindex" />
@@ -55,18 +82,10 @@ const hero = photos.heroWhaleShark;
       </>
     )}
 
-    <link rel="preload" href={frauncesUrl} as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href={manropeUrl} as="font" type="font/woff2" crossorigin />
-    <link rel="preconnect" href="https://images.unsplash.com" />
-    {preloadHero && (
-      <link
-        rel="preload"
-        as="image"
-        imagesrcset={srcset(hero.id, [640, 960, 1280, 1600, 2000, 2560])}
-        imagesizes="100vw"
-        fetchpriority="high"
-      />
-    )}
+    <noscript>
+      <link rel="preload" href={frauncesUrl} as="font" type="font/woff2" crossorigin />
+      <link rel="preload" href={manropeUrl} as="font" type="font/woff2" crossorigin />
+    </noscript>
 
     <link rel="icon" href={`${base}/favicon.ico`} sizes="32x32" />
     <link rel="icon" href={`${base}/favicon.svg`} type="image/svg+xml" />
@@ -77,17 +96,17 @@ const hero = photos.heroWhaleShark;
     <meta name="color-scheme" content="light" />
 
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content={lang === 'pt' ? 'Clube de Mergulho do Tofo' : 'Tofo Dive Club'} />
+    <meta property="og:site_name" content={d.meta.siteName} />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={pageDescription} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogImage} />
-    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content={d.meta.ogAlt} />
-    <meta property="og:locale" content={lang === 'pt' ? 'pt_MZ' : 'en_GB'} />
-    <meta property="og:locale:alternate" content={lang === 'pt' ? 'en_GB' : 'pt_MZ'} />
+    <meta property="og:locale" content={ogLocale[lang]} />
+    {[...new Set(langs.map((l) => ogLocale[l]))].filter((l) => l !== ogLocale[lang]).map((l) => <meta property="og:locale:alternate" content={l} />)}
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={pageTitle} />
     <meta name="twitter:description" content={pageDescription} />
@@ -99,5 +118,9 @@ const hero = photos.heroWhaleShark;
   <body>
     <a class="skip" href="#main">{d.skip}</a>
     <slot />
+    <p class="offline-note" role="status" data-offline data-text={d.data.offline}></p>
+    <script>
+      import '../scripts/offline';
+    </script>
   </body>
 </html>

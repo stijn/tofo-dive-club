@@ -1,9 +1,9 @@
 {
   "name": "tofo-dive-club",
   "type": "module",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "private": true,
-  "description": "MVP website for a community dive club in Tofo, Mozambique. English and Portuguese.",
+  "description": "MVP website for a community dive club in Tofo, Mozambique. English and Portuguese, Gitonga in translation. Works on patchy mobile data.",
   "engines": {
     "node": ">=22.23.4"
   },
@@ -12,9 +12,11 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "audit": "node tools/a11y/axe.mjs node_modules/axe-core/axe.min.js 1280 http://localhost:4321/tofo-dive-club/ http://localhost:4321/tofo-dive-club/pt/ http://localhost:4321/tofo-dive-club/404.html && node tools/a11y/axe.mjs node_modules/axe-core/axe.min.js 375 http://localhost:4321/tofo-dive-club/ http://localhost:4321/tofo-dive-club/pt/",
-    "audit:targets": "node tools/a11y/targets.mjs 1280 http://localhost:4321/tofo-dive-club/ http://localhost:4321/tofo-dive-club/pt/ && node tools/a11y/targets.mjs 375 http://localhost:4321/tofo-dive-club/ http://localhost:4321/tofo-dive-club/pt/",
-    "test:ui": "node tools/test/interactions.mjs"
+    "audit": "node tools/a11y/axe.mjs node_modules/axe-core/axe.min.js 1280 http://localhost:4321/tofo-dive-club/ http://localhost:4321/tofo-dive-club/pt/ http://localhost:4321/tofo-dive-club/toh/ http://localhost:4321/tofo-dive-club/404.html && node tools/a11y/axe.mjs node_modules/axe-core/axe.min.js 375 http://localhost:4321/tofo-dive-club/ http://localhost:4321/tofo-dive-club/pt/ && SAVE_DATA=1 node tools/a11y/axe.mjs node_modules/axe-core/axe.min.js 375 http://localhost:4321/tofo-dive-club/",
+    "audit:targets": "node tools/a11y/targets.mjs 1280 http://localhost:4321/tofo-dive-club/ http://localhost:4321/tofo-dive-club/pt/ http://localhost:4321/tofo-dive-club/toh/ && node tools/a11y/targets.mjs 375 http://localhost:4321/tofo-dive-club/ http://localhost:4321/tofo-dive-club/pt/",
+    "test:ui": "node tools/test/interactions.mjs",
+    "i18n:import": "node tools/i18n/import.mjs",
+    "perf": "node tools/perf/measure.mjs http://localhost:4321/tofo-dive-club/ slow3g --scroll --repeat"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",

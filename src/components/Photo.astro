@@ -1,0 +1,40 @@
+---
+// A photo with a blurred preview behind it. The wrapper fills its parent (the figure
+// sets the shape). Every photo is lazy: in data saver mode CSS hides the <img>, and a
+// hidden lazy image is never downloaded. The hero is preloaded from Base.astro instead.
+import type { PhotoKey } from '../config';
+import { photoSet } from '../lib/photo';
+
+interface Props {
+  photo: PhotoKey;
+  widths: number[];
+  /** Height / width of the crop. Leave out to keep the photo's own shape. */
+  ratio?: number;
+  sizes: string;
+  alt: string;
+  class?: string;
+  /** CSS object-position, also used for the preview. */
+  position?: string;
+  priority?: boolean;
+  /** No "Show photo" button (the hero, where text sits on top). */
+  noButton?: boolean;
+}
+const { photo, widths, ratio, sizes, alt, class: cls, position, priority = false, noButton = false } = Astro.props;
+const set = await photoSet(photo, widths, ratio);
+const style = `background-image:url("${set.lqip}")` + (position ? `;--ph-pos:${position}` : '');
+---
+<span class:list={['ph', cls]} style={style} data-ph data-kb={set.kb} data-no-button={noButton ? '' : undefined}>
+  <picture>
+    <source type="image/avif" srcset={set.avif} sizes={sizes} />
+    <source type="image/webp" srcset={set.webp} sizes={sizes} />
+    <img
+      src={set.fallback}
+      width={set.width}
+      height={set.height}
+      alt={alt}
+      loading="lazy"
+      decoding="async"
+      fetchpriority={priority ? 'high' : undefined}
+    />
+  </picture>
+</span>

@@ -1,5 +1,6 @@
 ---
-import { photos, srcset, unsplash, type Lang } from '../config';
+import type { Lang } from '../config';
+import Photo from './Photo.astro';
 import { t } from '../i18n';
 import { pillarIcons, depths } from '../data';
 import { rich } from '../lib/rich';
@@ -10,8 +11,6 @@ import Line from './Line.astro';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const d = t(lang).club;
-const diver = photos.diverSigns;
-const beach = photos.tofoBeach;
 ---
 <section class="section club" id="club" data-depth={depths.club} aria-labelledby="club-title">
   <div class="container club-grid">
@@ -30,28 +29,10 @@ const beach = photos.tofoBeach;
 
     <div class="club-media">
       <figure class="photo photo-tall reveal">
-        <img
-          src={unsplash(diver.id, 800, 1.25)}
-          width="800"
-          height="1000"
-          srcset={srcset(diver.id, [400, 600, 800, 1100], 1.25)}
-          sizes="(min-width: 960px) 34vw, 90vw"
-          alt={d.photoAlt}
-          loading="lazy"
-          decoding="async"
-        />
+        <Photo photo="diverSigns" widths={[400, 600, 800, 1100]} ratio={1.25} sizes="(min-width: 960px) 34vw, (min-width: 600px) 300px, calc(55vw - 25px)" alt={d.photoAlt} />
       </figure>
       <figure class="photo photo-wide reveal">
-        <img
-          src={unsplash(beach.id, 700, 0.7)}
-          width="700"
-          height="490"
-          srcset={srcset(beach.id, [400, 700, 1000], 0.7)}
-          sizes="(min-width: 960px) 22vw, 60vw"
-          alt={d.beachAlt}
-          loading="lazy"
-          decoding="async"
-        />
+        <Photo photo="tofoBeach" widths={[400, 700, 1000]} ratio={1.1} sizes="(min-width: 960px) 22vw, (min-width: 600px) 245px, calc(45vw - 20px)" alt={d.beachAlt} />
       </figure>
       <aside class="founder reveal">
         <Line name="heart" class="founder-icon" />

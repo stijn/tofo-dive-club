@@ -1,5 +1,6 @@
 ---
-import { photos, srcset, unsplash, type Lang } from '../config';
+import type { Lang } from '../config';
+import Photo from './Photo.astro';
 import { t } from '../i18n';
 import { rich } from '../lib/rich';
 import { manta } from '../lib/creatures';
@@ -12,7 +13,6 @@ const { lang } = Astro.props;
 const d = t(lang).seasons;
 const levelText = [d.legend.unlikely, d.legend.possible, d.legend.peak];
 const rows = (['sharks', 'mantas', 'whales'] as const).map((k) => ({ key: k, name: d.rows[k], values: seasons[k] }));
-const whale = photos.humpback;
 ---
 <section class="section seasons deep" id="seasons" data-depth={depths.seasons} aria-labelledby="seasons-title">
   <div class="bubbles" aria-hidden="true"></div>
@@ -21,16 +21,7 @@ const whale = photos.humpback;
     <div class="seasons-top">
       <SectionHead lang={lang} id="seasons" depth={depths.seasons} kicker={d.kicker} title={d.title} lead={d.lead} />
       <figure class="whale reveal">
-        <img
-          src={unsplash(whale.id, 640, 0.56)}
-          width="640"
-          height="358"
-          srcset={srcset(whale.id, [400, 640, 960], 0.56)}
-          sizes="(min-width: 960px) 420px, 92vw"
-          alt={d.photoAlt}
-          loading="lazy"
-          decoding="async"
-        />
+        <Photo photo="humpback" widths={[400, 640, 750, 960]} ratio={0.5625} sizes="(min-width: 960px) 420px, 92vw" alt={d.photoAlt} />
         <figcaption><Line name="alert-circle" /> {d.note}</figcaption>
       </figure>
     </div>

@@ -28,7 +28,7 @@ async function browser(width, height = 860) {
   const rect = (sel) => ev(`(() => { const r = document.querySelector(${JSON.stringify(sel)}).getBoundingClientRect(); return {x: r.x, y: r.y, w: r.width, h: r.height}; })()`);
   const go = async (path) => { await send('Page.navigate', { url: base + path }); await sleep(2800); };
   const scrollTo = async (sel, off = 120) => { await ev(`window.scrollTo({top: document.querySelector(${JSON.stringify(sel)}).getBoundingClientRect().top + scrollY - ${off}, behavior: 'instant'}); 1`); await sleep(800); };
-  return { ev, move, click, key, rect, go, scrollTo, errors, close: () => { ws.close(); chrome.kill(); } };
+  return { ev, send, move, click, key, rect, go, scrollTo, errors, close: () => { ws.close(); chrome.kill(); } };
 }
 
 // Desktop --------------------------------------------------------------
@@ -127,8 +127,85 @@ async function browser(width, height = 860) {
   check('menu opens', await b.ev(`document.querySelector('[data-menu-btn]').getAttribute('aria-expanded') === 'true'`));
   check('menu button tooltip updates', (await b.ev(`document.querySelector('[data-menu-btn]').dataset.tip`)) === 'Fechar menu');
   check('pause button reachable in the menu', await b.ev(`getComputedStyle(document.querySelector('[data-motion-btn]')).visibility === 'visible'`));
+  check('save data button reachable in the menu', await b.ev(`getComputedStyle(document.querySelector('[data-data-btn]')).visibility === 'visible'`));
   await b.ev(`document.querySelector('[data-menu-btn]').click(); 1`); await sleep(300);
   check('no horizontal scroll', await b.ev(`document.documentElement.scrollWidth <= innerWidth`));
+  check('no script errors', b.errors.length === 0, b.errors.join(' | '));
+  b.close();
+}
+
+// Weak signal --------------------------------------------------------
+{
+  console.log(`\nWeak signal 375px`);
+  const b = await browser(375, 812);
+  await b.send('Network.enable');
+  await b.go('/');
+  const resources = (re) => b.ev(`performance.getEntriesByType('resource').map((e) => e.name).filter((n) => ${re}.test(n)).length`);
+  check('photos come from this site, not Unsplash', (await resources('/images\\.unsplash\\.com/')) === 0 && (await b.ev(`[...document.querySelectorAll('[data-ph] img')].every((i) => !i.currentSrc || i.currentSrc.startsWith(location.origin))`)));
+  check('every photo has a blurred preview built in', await b.ev(`[...document.querySelectorAll('[data-ph]')].every((p) => p.style.backgroundImage.startsWith('url("data:image/svg+xml'))`));
+  check('the hero photo fades in once it has arrived', await b.ev(`document.querySelector('.hero-img img').classList.contains('is-loaded')`));
+  check('the stylesheet is inside the page', await b.ev(`document.querySelectorAll('link[rel=stylesheet]').length === 0 && document.querySelectorAll('style').length > 0`));
+
+  // Off-screen sections pause their loops.
+  await b.ev(`window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }); 1`); await sleep(700);
+  check('off-screen animations pause', await b.ev(`document.querySelector('.hero').classList.contains('is-offscreen') && getComputedStyle(document.querySelector('.hero-img')).animationPlayState === 'paused'`));
+  await b.ev(`window.scrollTo({ top: 0, behavior: 'instant' }); 1`); await sleep(700);
+  check('and play again on the way back', await b.ev(`!document.querySelector('.hero').classList.contains('is-offscreen') && getComputedStyle(document.querySelector('.hero-img')).animationPlayState === 'running'`));
+
+  // Data saver: switch on, reload, nothing heavy downloads.
+  await b.ev(`document.querySelector('[data-data-btn]').click(); 1`); await sleep(200);
+  check('save data switch turns on', await b.ev(`document.querySelector('[data-data-btn]').getAttribute('aria-pressed') === 'true' && localStorage.getItem('tdc-data') === 'save'`));
+  await b.go('/');
+  check('data saver: no fonts downloaded', (await resources('/\\.woff2/')) === 0, await b.ev(`getComputedStyle(document.body).fontFamily.slice(0, 30)`));
+  check('data saver: no photos downloaded', (await resources('/\\.(avif|webp|jpe?g)/')) === 0);
+  const showBtn = await b.ev(`(() => { const btn = document.querySelector('.club [data-ph] .ph-btn'); return btn && btn.textContent; })()`);
+  check('data saver: photos offer "Show photo" with their size', /^Show photo: .+\. \d+ KB$/.test(showBtn ?? ''), showBtn);
+  await b.scrollTo('.club-media', 100);
+  await b.ev(`document.querySelector('.club [data-ph] .ph-btn').click(); 1`); await sleep(1500);
+  check('tapping it loads that photo only', (await resources('/\\.(avif|webp|jpe?g)/')) === 1 && (await b.ev(`document.querySelector('.club [data-ph] img').classList.contains('is-loaded')`)));
+  check('and focus moves to the photo', await b.ev(`document.activeElement === document.querySelector('.club [data-ph] img')`));
+  await b.ev(`document.querySelector('[data-data-btn]').click(); 1`); await sleep(2000);
+  check('switching it off loads the rest', (await b.ev(`document.querySelectorAll('.ph-btn').length`)) === 0 && (await resources('/\\.woff2/')) > 0);
+
+  // A photo that fails keeps its preview, offers "Try again", and retries when the signal is back.
+  await b.send('Network.setBlockedURLs', { urls: ['*.avif', '*.webp', '*.jpeg', '*.jpg'] });
+  await b.go('/');
+  await b.scrollTo('.club-media', 100); await sleep(500);
+  check('a failed photo offers "Try again"', await b.ev(`document.querySelector('.club [data-ph]').classList.contains('is-failed') && /^Try again/.test(document.querySelector('.club [data-ph] .ph-btn')?.textContent ?? '')`));
+  await b.send('Network.setBlockedURLs', { urls: [] });
+  await b.ev(`window.dispatchEvent(new Event('online')); 1`); await sleep(1500);
+  check('and retries when the signal comes back', await b.ev(`!document.querySelector('.club [data-ph]').classList.contains('is-failed') && document.querySelector('.club [data-ph] img').classList.contains('is-loaded')`));
+
+  // Offline after one visit.
+  await sleep(4500); // the worker registers once the page has gone quiet
+  check('the site saves itself for offline', await b.ev(`navigator.serviceWorker.ready.then(() => caches.open('tdc-pages')).then((c) => c.keys()).then((k) => k.some((r) => r.url === location.origin + location.pathname))`));
+  await b.send('Network.emulateNetworkConditions', { offline: true, latency: 0, downloadThroughput: -1, uploadThroughput: -1 });
+  await b.go('/');
+  check('with no signal the page still opens', await b.ev(`!!document.getElementById('hero-title') && performance.getEntriesByType('navigation')[0].workerStart > 0`));
+  check('and says it is the saved copy', /No signal/.test(await b.ev(`document.querySelector('[data-offline]').textContent`)));
+  await b.scrollTo('#join', 80);
+  await b.ev(`window.open = (u) => { window.__opened = u; }; document.getElementById('f-name').value = 'Isa'; document.querySelector('[data-join-form] button[value=whatsapp]').click(); 1`); await sleep(400);
+  check('the form says WhatsApp will send it later', await b.ev(`!document.querySelector('[data-done-offline]').hidden && !!window.__opened`));
+  await b.send('Network.emulateNetworkConditions', { offline: false, latency: 0, downloadThroughput: -1, uploadThroughput: -1 });
+  check('no script errors', b.errors.length === 0, b.errors.join(' | '));
+  b.close();
+}
+
+// Gitonga ------------------------------------------------------------
+{
+  console.log(`\nGitonga (being translated)`);
+  const b = await browser(1280);
+  await b.go('/toh/');
+  check('Gitonga page exists, kept out of search for now', await b.ev(`document.querySelector('meta[name=robots]').content === 'noindex'`));
+  check('its text is Portuguese until translated, and says so', (await b.ev(`document.documentElement.lang`)) === 'pt-MZ' && /\d+ de \d+/.test(await b.ev(`document.querySelector('.translation-note').textContent`)));
+  check('footer lists it as the current language', await b.ev(`document.querySelector('.footer-langs [aria-current=page]')?.textContent === 'Gitonga'`));
+  const csv = await b.ev(`fetch('${base}/translations/gitonga.csv').then((r) => r.text())`);
+  const rows = csv.trim().split('\r\n');
+  check('the translation sheet downloads', rows[0].includes('"Gitonga"') && rows.length > 300, `${rows.length - 1} texts`);
+  const m = await b.ev(`fetch('${base}/manifest-toh.webmanifest').then((r) => r.json()).then((j) => j.start_url)`);
+  check('it has its own app manifest', m === '/tofo-dive-club/toh/', m);
+  await b.go('/');
+  check('English page does not list Gitonga yet', await b.ev(`![...document.querySelectorAll('.footer-langs a')].some((a) => a.textContent === 'Gitonga') && !document.querySelector('link[hreflang=toh]')`));
   check('no script errors', b.errors.length === 0, b.errors.join(' | '));
   b.close();
 }

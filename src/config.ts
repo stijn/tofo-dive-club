@@ -1,8 +1,9 @@
 // Club details in one place. Empty values are hidden on the site,
 // and the join form still works without them (it lets people pick a contact).
+// The club's name in each language is meta.siteName in src/i18n/.
+import { tohReady } from './i18n/progress';
 
 export const club = {
-  name: { en: 'Tofo Dive Club', pt: 'Clube de Mergulho do Tofo' },
   // International format, digits only, e.g. '258841234567'. Empty: WhatsApp asks who to send to.
   whatsapp: '',
   // Empty: the email app opens with no recipient filled in.
@@ -12,12 +13,23 @@ export const club = {
   map: 'https://www.openstreetmap.org/?mlat=-23.8525&mlon=35.5465#map=15/-23.8525/35.5465',
 };
 
-export type Lang = 'en' | 'pt';
-export const langs: Lang[] = ['en', 'pt'];
-export const htmlLang: Record<Lang, string> = { en: 'en', pt: 'pt-MZ' };
+export type Lang = 'en' | 'pt' | 'toh';
+/** Every language that has a page. */
+export const allLangs: Lang[] = ['en', 'pt', 'toh'];
+/** Languages in the menu, search results and sitemap. Gitonga joins once it's fully translated. */
+export const langs: Lang[] = tohReady ? ['en', 'pt', 'toh'] : ['en', 'pt'];
+export const listed = (lang: Lang) => langs.includes(lang);
+/** The page's lang attribute. Until Gitonga is done its page is Portuguese text, so it says so. */
+export const htmlLang: Record<Lang, string> = { en: 'en', pt: 'pt-MZ', toh: tohReady ? 'toh' : 'pt-MZ' };
+/** Each language in its own words, for the footer's language list. */
+export const langNames: Record<Lang, string> = { en: 'English', pt: 'Português', toh: 'Gitonga' };
+/** og:locale. Facebook has no Gitonga, so that page shares as Portuguese (Mozambique). */
+export const ogLocale: Record<Lang, string> = { en: 'en_GB', pt: 'pt_MZ', toh: 'pt_MZ' };
 
-// Photos are hotlinked from Unsplash (Unsplash License), as Unsplash asks.
-// Swap them for the club's own photos when there are some.
+// Photos come from Unsplash (Unsplash License: free to use and to host yourself).
+// The masters live in src/assets/photos/<key>.jpg and src/lib/photo.ts turns them into
+// small AVIF/WebP files at build time. To use the club's own photos, replace a JPEG
+// there (keep the file name) and update the credit here.
 const utm = '?utm_source=tofo_dive_club&utm_medium=referral';
 
 export const photos = {
@@ -64,12 +76,3 @@ export const photos = {
 } as const;
 
 export type PhotoKey = keyof typeof photos;
-
-export function unsplash(id: string, w: number, ratio?: number) {
-  const h = ratio ? `&h=${Math.round(w * ratio)}` : '';
-  return `https://images.unsplash.com/${id}?auto=format&fit=crop&q=70&w=${w}${h}`;
-}
-
-export function srcset(id: string, widths: number[], ratio?: number) {
-  return widths.map((w) => `${unsplash(id, w, ratio)} ${w}w`).join(', ');
-}

@@ -134,6 +134,7 @@ const strings = {
         <div data-done-body hidden>
           <strong>{f.doneTitle}</strong>
           <p>{f.doneText}</p>
+          <p class="form-offline" data-done-offline hidden><Line name="alert-circle" /> {t(lang).data.offlineForm}</p>
         </div>
       </div>
     </form>
@@ -205,6 +206,7 @@ const strings = {
 
     // The status region already exists, so screen readers announce the new text.
     doneBody.hidden = false;
+    doneBody.querySelector<HTMLElement>('[data-done-offline]')!.hidden = navigator.onLine;
     done.classList.add('is-done');
     done.querySelector<SVGSVGElement>('svg')?.setCurrentTime?.(0);
     document.dispatchEvent(new CustomEvent('tdc:logged', { detail: done }));

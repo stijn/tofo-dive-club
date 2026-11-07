@@ -4,6 +4,9 @@ import type { Dict } from './en';
 
 const pt: Dict = {
   meta: {
+    siteName: 'Clube de Mergulho do Tofo',
+    shortName: 'Mergulho Tofo',
+    appDescription: 'Clube de mergulho comunitário na Praia do Tofo, Moçambique.',
     title: 'Clube de Mergulho do Tofo · Mergulho em Moçambique',
     description:
       'Um clube de mergulho comunitário na Praia do Tofo, Moçambique. Tubarões-baleia, raias-manta e recifes com uma equipa fixa. Junte-se aos fundadores.',
@@ -29,6 +32,16 @@ const pt: Dict = {
   },
   lang: { other: 'EN', otherLabel: 'EN, read in English', tip: 'Read in English' },
   motion: { pause: 'Pausar animações', play: 'Retomar animações' },
+  data: {
+    label: 'Poupar dados',
+    tipOff: 'Poupar dados: as fotos só carregam quando lhes toca',
+    tipOn: 'A poupar dados. Toque para carregar todas as fotos',
+    show: 'Mostrar foto',
+    failed: 'A foto não carregou.',
+    retry: 'Tentar de novo',
+    offline: 'Sem rede. Está a ler a cópia guardada neste telemóvel.',
+    offlineForm: 'Sem rede neste momento. O WhatsApp guarda a sua mensagem e envia-a quando voltar a ter rede.',
+  },
   gauge: { label: 'Profundidade' },
   hero: {
     place: 'Praia do Tofo · Inhambane · Moçambique',
@@ -379,6 +392,7 @@ const pt: Dict = {
     icons: 'Ícones: Font Awesome Free e line-md',
     built: 'Feito com Astro',
     top: 'Voltar à superfície',
+    languages: 'Línguas',
   },
   notFound: {
     kicker: '404',

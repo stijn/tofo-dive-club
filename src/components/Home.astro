@@ -14,7 +14,8 @@ import Glossary from './Glossary.astro';
 import Footer from './Footer.astro';
 import Gauge from './Gauge.astro';
 import Smb from './Smb.astro';
-import { club, htmlLang, type Lang } from '../config';
+import { club, htmlLang, langs, listed, type Lang } from '../config';
+import TranslationNote from './TranslationNote.astro';
 import { t } from '../i18n';
 import { plain } from '../lib/rich';
 
@@ -29,6 +30,7 @@ const homeEn = getAbsoluteLocaleUrl('en', '');
 // Structured data for search engines: the site, the club as a local sports club,
 // this page, and the FAQ.
 const sameAs = [club.instagram, club.facebook].filter(Boolean);
+const names = (except: Lang) => [...new Set(langs.filter((l) => l !== except).map((l) => t(l).meta.siteName))];
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -36,19 +38,19 @@ const jsonLd = {
       '@type': 'WebSite',
       '@id': `${homeEn}#website`,
       url: homeEn,
-      name: club.name.en,
-      alternateName: club.name.pt,
-      inLanguage: ['en', 'pt-MZ'],
+      name: t('en').meta.siteName,
+      alternateName: names('en'),
+      inLanguage: langs.map((l) => htmlLang[l]),
     },
     {
       '@type': 'SportsClub',
       '@id': `${homeEn}#club`,
-      name: club.name[lang],
-      alternateName: club.name[lang === 'en' ? 'pt' : 'en'],
+      name: d.meta.siteName,
+      alternateName: names(lang),
       description: d.meta.description,
       url: pageUrl,
       logo: `${site}${base}/icon-512.png`,
-      image: `${site}${base}/og/og-${lang}.png`,
+      image: `${site}${base}/og/og-${lang}.jpg`,
       sport: 'Scuba diving',
       knowsLanguage: ['en', 'pt'],
       address: {
@@ -74,7 +76,7 @@ const jsonLd = {
       inLanguage: htmlLang[lang],
       isPartOf: { '@id': `${homeEn}#website` },
       about: { '@id': `${homeEn}#club` },
-      primaryImageOfPage: `${site}${base}/og/og-${lang}.png`,
+      primaryImageOfPage: `${site}${base}/og/og-${lang}.jpg`,
     },
     {
       '@type': 'FAQPage',
@@ -94,6 +96,7 @@ const jsonLd = {
   <Header lang={lang} />
   <Gauge lang={lang} />
   <main id="main" tabindex="-1">
+    {!listed(lang) && <TranslationNote />}
     <Hero lang={lang} />
     <Club lang={lang} />
     <Dives lang={lang} />
@@ -111,5 +114,6 @@ const jsonLd = {
     import '../scripts/treats';
     import '../scripts/charts';
     import '../scripts/tooltips';
+    import '../scripts/offscreen';
   </script>
 </Base>
