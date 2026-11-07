@@ -61,7 +61,11 @@ const jsonLd = {
       },
       geo: { '@type': 'GeoCoordinates', latitude: -23.8525, longitude: 35.5465 },
       hasMap: club.map,
-      areaServed: { '@type': 'Place', name: 'Tofo, Inhambane, Mozambique' },
+      // Tofo lies on the stretch of coast known as the Manta Coast.
+      areaServed: [
+        { '@type': 'Place', name: 'Tofo, Inhambane, Mozambique' },
+        { '@type': 'Place', name: 'Manta Coast, Inhambane, Mozambique', alternateName: 'Costa das Mantas' },
+      ],
       founder: { '@type': 'Person', name: 'Isa' },
       ...(club.email && { email: club.email }),
       ...(club.whatsapp && { telephone: `+${club.whatsapp}` }),
@@ -115,5 +119,6 @@ const jsonLd = {
     import '../scripts/charts';
     import '../scripts/tooltips';
     import '../scripts/offscreen';
+    import '../scripts/delight';
   </script>
 </Base>

@@ -1,10 +1,5 @@
 ---
-import '@fontsource-variable/fraunces/full.css';
-import '@fontsource-variable/fraunces/full-italic.css';
-import '@fontsource-variable/manrope';
 import '../styles/global.css';
-import frauncesUrl from '@fontsource-variable/fraunces/files/fraunces-latin-full-normal.woff2?url';
-import manropeUrl from '@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2?url';
 import { getAbsoluteLocaleUrl } from 'astro:i18n';
 import { htmlLang, langs, listed, ogLocale, type Lang } from '../config';
 import { t } from '../i18n';
@@ -30,11 +25,9 @@ const site = Astro.site!.origin;
 const canonical = getAbsoluteLocaleUrl(lang, path);
 // Gitonga shares the Portuguese preview image until it has its own.
 const ogImage = `${site}${base}/og/og-${lang === 'toh' ? 'pt' : lang}.jpg`;
+// The site uses the phone's own fonts, so there are no font files to load.
 // Preloads go in from the head script, so data saver mode can skip them.
-const preloads: Record<string, string>[] = [
-  { rel: 'preload', as: 'font', type: 'font/woff2', crossorigin: 'anonymous', href: frauncesUrl },
-  { rel: 'preload', as: 'font', type: 'font/woff2', crossorigin: 'anonymous', href: manropeUrl },
-];
+const preloads: Record<string, string>[] = [];
 if (preloadHero) {
   const hero = await photoSet('heroWhaleShark', heroWidths);
   preloads.push({ rel: 'preload', as: 'image', type: hero.preload.type, imagesrcset: hero.preload.srcset, imagesizes: '100vw', fetchpriority: 'high' });
@@ -48,19 +41,40 @@ if (preloadHero) {
     <title>{pageTitle}</title>
     <meta name="description" content={pageDescription} />
     <script is:inline define:vars={{ preloads }}>
-      var r = document.documentElement, s = null, d = null, c = navigator.connection;
-      try { s = localStorage.getItem('tdc-motion'); d = localStorage.getItem('tdc-data'); } catch (e) {}
+      var r = document.documentElement, s = null, d = null, n = null, c = navigator.connection;
+      try {
+        s = localStorage.getItem('tdc-motion');
+        d = sessionStorage.getItem('tdc-data');
+        n = JSON.parse(localStorage.getItem('tdc-net') || 'null');
+        localStorage.removeItem('tdc-data'); // 0.5.0 kept the button's choice for good
+      } catch (e) {}
       // Animations follow the saved choice, else the system's reduce-motion setting.
       var off = s ? s === 'off' : matchMedia('(prefers-reduced-motion: reduce)').matches;
       r.classList.add('js', off ? 'motion-off' : 'js-motion');
-      // Data saver follows the saved choice, else the phone: its data saver, or a 2G connection.
-      var save = d ? d === 'save' : !!(c && (c.saveData || /2g$/.test(c.effectiveType || '')));
-      if (save) r.classList.add('save-data', 'save-fonts');
-      else preloads.forEach(function (p) {
-        var l = document.createElement('link');
-        for (var k in p) l.setAttribute(k, p[k]);
-        document.head.appendChild(l);
-      });
+      // Data saver: the button's choice on this visit; else the phone's own data saver;
+      // else a 2G connection, or a slow one measured in the last hour. Once the page has
+      // arrived, src/scripts/data-saver.ts measures this connection and corrects it.
+      var save = d ? d === 'save' : !!(c && (c.saveData || /2g$/.test(c.effectiveType || ''))) || !!(n && n.slow && Date.now() - n.t < 36e5);
+      if (save) r.classList.add('save-data');
+      else {
+        preloads.forEach(function (p) {
+          var l = document.createElement('link');
+          for (var k in p) l.setAttribute(k, p[k]);
+          document.head.appendChild(l);
+        });
+        // The other language loads in the background as soon as someone hovers over or
+        // touches a language link, so switching is instant (Chrome and Edge). Not when
+        // saving data: that page would cost about 50 KB the visitor may not want.
+        var sr = document.createElement('script');
+        sr.type = 'speculationrules';
+        sr.textContent = JSON.stringify({ prerender: [{ where: { selector_matches: '[data-lang-switch], .footer-langs a' }, eagerness: 'moderate' }] });
+        document.head.appendChild(sr);
+      }
+      // Pages cross-fade into each other (see @view-transition in global.css), but not
+      // while animations are paused.
+      var still = function (e) { if (e.viewTransition && r.classList.contains('motion-off')) e.viewTransition.skipTransition(); };
+      addEventListener('pageswap', still);
+      addEventListener('pagereveal', still);
       // Photos fade in over their blurred preview once they arrive. A photo that fails
       // keeps its preview and gets a "Try again" button (load events don't bubble: capture).
       document.addEventListener('load', function (e) {
@@ -82,14 +96,11 @@ if (preloadHero) {
       </>
     )}
 
-    <noscript>
-      <link rel="preload" href={frauncesUrl} as="font" type="font/woff2" crossorigin />
-      <link rel="preload" href={manropeUrl} as="font" type="font/woff2" crossorigin />
-    </noscript>
-
-    <link rel="icon" href={`${base}/favicon.ico`} sizes="32x32" />
-    <link rel="icon" href={`${base}/favicon.svg`} type="image/svg+xml" />
-    <link rel="apple-touch-icon" href={`${base}/apple-touch-icon.png`} />
+    {/* Safari keeps a site's icon in its own cache, even a missing one: the ?v= makes
+        it fetch these again after a change. Bump it whenever an icon changes. */}
+    <link rel="icon" href={`${base}/favicon.ico?v=2`} sizes="32x32" />
+    <link rel="icon" href={`${base}/favicon.svg?v=2`} type="image/svg+xml" />
+    <link rel="apple-touch-icon" href={`${base}/apple-touch-icon.png?v=2`} />
     <link rel="manifest" href={`${base}/manifest-${lang}.webmanifest`} />
     <link rel="sitemap" href={`${base}/sitemap-index.xml`} />
     <meta name="theme-color" content="#04192a" />

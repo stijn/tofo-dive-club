@@ -16,8 +16,13 @@ async function browser(width, height = 860) {
   let target;
   for (let i = 0; i < 60 && !target; i++) { await sleep(150); try { target = (await (await fetch(`http://127.0.0.1:${port}/json`)).json()).find((t) => t.type === 'page'); } catch {} }
   const ws = new WebSocket(target.webSocketDebuggerUrl); await new Promise((r) => (ws.onopen = r));
-  let id = 0; const pending = new Map(); const errors = [];
-  ws.onmessage = (m) => { const msg = JSON.parse(m.data); if (msg.id && pending.has(msg.id)) { pending.get(msg.id)(msg); pending.delete(msg.id); } else if (msg.method === 'Runtime.exceptionThrown') errors.push(msg.params.exceptionDetails.exception?.description); };
+  let id = 0; const pending = new Map(); const errors = []; const events = [];
+  ws.onmessage = (m) => {
+    const msg = JSON.parse(m.data);
+    if (msg.id && pending.has(msg.id)) { pending.get(msg.id)(msg); pending.delete(msg.id); }
+    else if (msg.method === 'Runtime.exceptionThrown') errors.push(msg.params.exceptionDetails.exception?.description);
+    else if (/^(Preload|Page\.backForwardCache)/.test(msg.method ?? '')) events.push(msg);
+  };
   const send = (method, params = {}) => new Promise((r) => { const i = ++id; pending.set(i, r); ws.send(JSON.stringify({ id: i, method, params })); });
   await send('Page.enable'); await send('Runtime.enable');
   await send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: width < 768 });
@@ -28,7 +33,9 @@ async function browser(width, height = 860) {
   const rect = (sel) => ev(`(() => { const r = document.querySelector(${JSON.stringify(sel)}).getBoundingClientRect(); return {x: r.x, y: r.y, w: r.width, h: r.height}; })()`);
   const go = async (path) => { await send('Page.navigate', { url: base + path }); await sleep(2800); };
   const scrollTo = async (sel, off = 120) => { await ev(`window.scrollTo({top: document.querySelector(${JSON.stringify(sel)}).getBoundingClientRect().top + scrollY - ${off}, behavior: 'instant'}); 1`); await sleep(800); };
-  return { ev, send, move, click, key, rect, go, scrollTo, errors, close: () => { ws.close(); chrome.kill(); } };
+  // Waits up to `ms` for a condition, so a busy machine doesn't fail a check that is only slow.
+  const until = async (e, ms = 4000) => { for (const end = Date.now() + ms; Date.now() < end; await sleep(100)) if (await ev(e)) return true; return false; };
+  return { ev, send, move, click, key, rect, go, scrollTo, until, errors, events, close: () => { ws.close(); chrome.kill(); } };
 }
 
 // Desktop --------------------------------------------------------------
@@ -94,9 +101,19 @@ async function browser(width, height = 860) {
 
   await b.ev(`document.body.focus(); for (const k of 'manta') document.dispatchEvent(new KeyboardEvent('keydown', { key: k, bubbles: true })); 1`); await sleep(200);
   check('typing "manta" releases mantas', (await b.ev(`document.querySelectorAll('.fx-manta').length`)) === 3);
+  check('and they all start off-screen, so nothing spoils the surprise', await b.ev(`[...document.querySelectorAll('.fx-manta')].every((m) => m.getBoundingClientRect().right <= 0)`));
 
-  await b.ev(`window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }); 1`); await sleep(1200);
-  check('a whale swims past at the bottom', await b.ev(`document.querySelector('.whale-pass').classList.contains('is-swimming')`));
+  await b.ev(`window.scrollTo({ top: 0, behavior: 'instant' }); location.reload(); 1`); await sleep(2800);
+  await b.ev(`window.scrollTo({ top: document.querySelector('#sites').offsetTop, behavior: 'instant' }); 1`); await sleep(150);
+  const early = Number(await b.ev(`document.querySelector('#sites [data-count]').textContent`));
+  await sleep(1000);
+  check('depth labels tick up as you reach them', early < 16 && (await b.ev(`document.querySelector('#sites [data-count]').textContent`)) === '16', `${early} → 16`);
+  check('and screen readers get the real depth', (await b.ev(`document.querySelector('#sites .kicker-depth .visually-hidden').textContent`)) === '16');
+  check('a whale shark cruises along the surface at the dive sites', await b.until(`document.querySelector('.shark-pass').classList.contains('is-swimming')`));
+  check('with its spots, sweeping tail and pilot fish', await b.ev(`(document.querySelector('.shark-pass .spots').getAttribute('d').match(/M/g) || []).length > 100 && getComputedStyle(document.querySelector('.shark-pass .tail')).animationName === 'shark-tail' && document.querySelectorAll('.shark-pass .pilot').length === 3`));
+
+  await b.ev(`window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }); 1`);
+  check('a whale swims past at the bottom', await b.until(`document.querySelector('.whale-pass').classList.contains('is-swimming')`));
 
   // Ascent: record scrollY every frame and check it only ever moves up, without jumps.
   await b.ev(`window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }); 1`); await sleep(500);
@@ -134,6 +151,52 @@ async function browser(width, height = 860) {
   b.close();
 }
 
+// Switching language ----------------------------------------------------
+{
+  console.log(`\nSwitching language`);
+  const b = await browser(1280);
+  await b.send('Preload.enable');
+  await b.send('Page.addScriptToEvaluateOnNewDocument', { source: `addEventListener('pagereveal', (e) => { window.__vt = !!e.viewTransition }); addEventListener('pageshow', (e) => { window.__persisted = e.persisted })` });
+  await b.go('/');
+  await b.scrollTo('#sites', 50);
+  const r = await b.rect('[data-lang-switch]');
+  await b.move(r.x + r.w / 2, r.y + r.h / 2); await sleep(1500);
+  check('hovering the switch aims it at the section in view', (await b.ev(`document.querySelector('[data-lang-switch]').href`)).endsWith('/pt/#sites'));
+  // Chrome only prerenders outside DevTools; under remote control it falls back to a prefetch.
+  check('and loads the Portuguese page in advance', b.events.some((e) => /^Preload\.(prerender|prefetch)StatusUpdated$/.test(e.method) && e.params.key?.url?.endsWith('/pt/')));
+  await b.click(r.x + r.w / 2, r.y + r.h / 2); await sleep(2500);
+  check('the switch cross-fades (view transition)', (await b.ev('location.pathname')).endsWith('/pt/') && (await b.ev('window.__vt')) === true);
+  await b.ev(`history.back(); 1`); await sleep(2000);
+  check('Back comes straight from the back/forward cache', (await b.ev('window.__persisted')) === true, JSON.stringify(b.events.filter((e) => e.method === 'Page.backForwardCacheNotUsed').map((e) => e.params.notRestoredExplanations?.map((x) => x.reason))));
+  await b.ev(`document.querySelector('[data-motion-btn]').click(); 1`); await sleep(200);
+  await b.ev(`location.href = document.querySelector('[data-lang-switch]').href; 1`); await sleep(2500);
+  check('no cross-fade while animations are paused', (await b.ev('window.__vt')) === false);
+  check('no script errors', b.errors.length === 0, b.errors.join(' | '));
+  b.close();
+}
+
+// Data saver decides by itself ------------------------------------------
+{
+  console.log(`\nData saver by itself`);
+  let b = await browser(375, 812);
+  await b.send('Page.addScriptToEvaluateOnNewDocument', { source: `try { if (!sessionStorage.getItem('seeded')) { localStorage.setItem('tdc-data', 'save'); sessionStorage.setItem('seeded', '1'); } } catch (e) {}` });
+  await b.go('/');
+  check('on a fast connection it stays off', await b.ev(`!document.documentElement.classList.contains('save-data') && JSON.parse(localStorage.getItem('tdc-net')).slow === false`));
+  check('a choice remembered by 0.5.0 is forgotten', await b.ev(`localStorage.getItem('tdc-data') === null`));
+  check('the button shows Android\'s data saver icon', await b.ev(`!!document.querySelector('[data-data-btn] svg[viewBox="0 0 24 24"] path')`));
+  b.close();
+
+  b = await browser(375, 812);
+  await b.send('Network.enable');
+  await b.send('Network.emulateNetworkConditions', { offline: false, latency: 400, downloadThroughput: 50000, uploadThroughput: 50000 });
+  await b.go('/'); await sleep(1500);
+  check('on slow 3G it switches on by itself', await b.ev(`document.documentElement.classList.contains('save-data') && document.querySelector('[data-data-btn]').getAttribute('aria-pressed') === 'true'`));
+  check('and says why', /^Slow connection/.test(await b.ev(`document.querySelector('[data-data-btn]').dataset.tip`)), await b.ev(`document.querySelector('[data-data-btn]').dataset.tip`));
+  check('and remembers the slow connection for the next page', await b.ev(`JSON.parse(localStorage.getItem('tdc-net')).slow === true`));
+  check('no script errors', b.errors.length === 0, b.errors.join(' | '));
+  b.close();
+}
+
 // Weak signal --------------------------------------------------------
 {
   console.log(`\nWeak signal 375px`);
@@ -145,6 +208,7 @@ async function browser(width, height = 860) {
   check('every photo has a blurred preview built in', await b.ev(`[...document.querySelectorAll('[data-ph]')].every((p) => p.style.backgroundImage.startsWith('url("data:image/svg+xml'))`));
   check('the hero photo fades in once it has arrived', await b.ev(`document.querySelector('.hero-img img').classList.contains('is-loaded')`));
   check('the stylesheet is inside the page', await b.ev(`document.querySelectorAll('link[rel=stylesheet]').length === 0 && document.querySelectorAll('style').length > 0`));
+  check('no font files: the phone\'s own fonts', (await resources('/\\.(woff2?|ttf|otf)/')) === 0 && (await b.ev(`document.fonts.size`)) === 0, await b.ev(`getComputedStyle(document.querySelector('h1')).fontFamily.slice(0, 30)`));
 
   // Off-screen sections pause their loops.
   await b.ev(`window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }); 1`); await sleep(700);
@@ -154,10 +218,11 @@ async function browser(width, height = 860) {
 
   // Data saver: switch on, reload, nothing heavy downloads.
   await b.ev(`document.querySelector('[data-data-btn]').click(); 1`); await sleep(200);
-  check('save data switch turns on', await b.ev(`document.querySelector('[data-data-btn]').getAttribute('aria-pressed') === 'true' && localStorage.getItem('tdc-data') === 'save'`));
+  check('save data switch turns on, for this visit', await b.ev(`document.querySelector('[data-data-btn]').getAttribute('aria-pressed') === 'true' && sessionStorage.getItem('tdc-data') === 'save' && localStorage.getItem('tdc-data') === null`));
   await b.go('/');
-  check('data saver: no fonts downloaded', (await resources('/\\.woff2/')) === 0, await b.ev(`getComputedStyle(document.body).fontFamily.slice(0, 30)`));
   check('data saver: no photos downloaded', (await resources('/\\.(avif|webp|jpe?g)/')) === 0);
+  check('data saver: the tooltip says how much it saves', /\d+ KB saved on this page$/.test(await b.ev(`document.querySelector('[data-data-btn]').dataset.tip`)), await b.ev(`document.querySelector('[data-data-btn]').dataset.tip`));
+  check('data saver: the other language isn\'t loaded in advance', await b.ev(`document.querySelectorAll('script[type=speculationrules]').length === 0`));
   const showBtn = await b.ev(`(() => { const btn = document.querySelector('.club [data-ph] .ph-btn'); return btn && btn.textContent; })()`);
   check('data saver: photos offer "Show photo" with their size', /^Show photo: .+\. \d+ KB$/.test(showBtn ?? ''), showBtn);
   await b.scrollTo('.club-media', 100);
@@ -165,7 +230,7 @@ async function browser(width, height = 860) {
   check('tapping it loads that photo only', (await resources('/\\.(avif|webp|jpe?g)/')) === 1 && (await b.ev(`document.querySelector('.club [data-ph] img').classList.contains('is-loaded')`)));
   check('and focus moves to the photo', await b.ev(`document.activeElement === document.querySelector('.club [data-ph] img')`));
   await b.ev(`document.querySelector('[data-data-btn]').click(); 1`); await sleep(2000);
-  check('switching it off loads the rest', (await b.ev(`document.querySelectorAll('.ph-btn').length`)) === 0 && (await resources('/\\.woff2/')) > 0);
+  check('switching it off loads the rest', (await b.ev(`document.querySelectorAll('.ph-btn').length`)) === 0 && (await resources('/\\.(avif|webp|jpe?g)/')) > 1);
 
   // A photo that fails keeps its preview, offers "Try again", and retries when the signal is back.
   await b.send('Network.setBlockedURLs', { urls: ['*.avif', '*.webp', '*.jpeg', '*.jpg'] });

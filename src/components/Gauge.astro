@@ -23,6 +23,7 @@ const d = t(lang);
   const gauge = document.querySelector<HTMLElement>('[data-gauge]')!;
   const sections = [...document.querySelectorAll<HTMLElement>('[data-depth]')];
   const maxDepth = Number(gauge.dataset.max) || 30;
+  const readout = value.parentElement!;
 
   let ticking = false;
   const update = () => {
@@ -44,6 +45,12 @@ const d = t(lang);
     }
     if (atBottom) depth = maxDepth;
     const shown = Math.round(depth);
+    // Passing 10, 20 or 30 m: a little bounce of the readout (see .is-tick).
+    if (Math.floor(shown / 10) !== Math.floor(Number(value.textContent) / 10) && shown > 0) {
+      readout.classList.remove('is-tick');
+      void readout.offsetWidth;
+      readout.classList.add('is-tick');
+    }
     value.textContent = String(shown);
     gauge.style.setProperty('--depth', String(depth / maxDepth));
     gauge.classList.toggle('is-surface', shown === 0);
@@ -54,7 +61,7 @@ const d = t(lang);
       requestAnimationFrame(update);
     }
   };
-  update();
+  requestAnimationFrame(update); // not during start-up: reading positions now forces a layout
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', onScroll);
 </script>

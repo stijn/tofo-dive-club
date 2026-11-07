@@ -1,18 +1,44 @@
 // Data saver mode and photo fallbacks, for slow or patchy mobile data.
-// The head script in Base.astro switches it on before anything loads (saved choice,
-// else the phone's data saver or a 2G connection). In this mode CSS hides photos that
-// haven't loaded, so they're never downloaded, and each one gets a "Show photo · 42 KB"
-// button. A photo that fails keeps its blurred preview and gets a "Try again" button,
-// and every failed photo retries by itself when the connection comes back.
+// It decides by itself, and the button overrides it for the rest of the visit:
+// - The head script in Base.astro switches it on before anything loads when the phone
+//   asks to save data (its data saver), on a 2G connection, or when the last visit in
+//   the past hour measured a slow connection.
+// - Once the page has arrived, this script measures how fast it came and switches the
+//   mode to match: off on wifi or good mobile data, on below about 500 kbit/s. That works
+//   in every browser, unlike the connection hints, which only Chrome on Android has.
+// - The button's choice lasts for this visit (the browser tab). Next time the site
+//   measures again, so a choice made on mobile data doesn't stick on home wifi.
+// In this mode CSS hides photos that haven't loaded, so they're never downloaded, and
+// each one gets a "Show photo · 42 KB" button. A photo that fails keeps its blurred
+// preview and gets a "Try again" button, and every failed photo retries by itself when
+// the connection comes back.
 import { setTip } from './tooltips';
 
-const KEY = 'tdc-data';
+const CHOICE = 'tdc-data'; // sessionStorage: 'save' or 'full', set by the button
+const SPEED = 'tdc-net'; // localStorage: { slow, t } from the last measurement
+const SLOW_KBPS = 500;
 const root = document.documentElement;
 const btn = document.querySelector<HTMLButtonElement>('[data-data-btn]');
 const text = {
   show: btn?.dataset.show ?? 'Show photo',
   failed: btn?.dataset.failed ?? 'The photo didn’t load.',
   retry: btn?.dataset.retry ?? 'Try again',
+};
+let auto = false; // switched on by the site rather than the button
+
+const store = (area: 'local' | 'session', key: string, value: string) => {
+  try {
+    (area === 'local' ? localStorage : sessionStorage).setItem(key, value);
+  } catch {
+    /* private mode: nothing is remembered */
+  }
+};
+const chosen = () => {
+  try {
+    return sessionStorage.getItem(CHOICE);
+  } catch {
+    return null;
+  }
 };
 
 export const saving = () => root.classList.contains('save-data');
@@ -84,24 +110,49 @@ function sync() {
   }
   if (btn) {
     btn.setAttribute('aria-pressed', String(saving()));
-    setTip(btn, (saving() ? btn.dataset.tipOn : btn.dataset.tipOff)!);
+    // While saving, the tooltip also says how much: the photos still waiting for a tap.
+    const kb = photos().filter((ph) => ph.querySelector('.ph-btn[data-kind="show"]')).reduce((sum, ph) => sum + kbFor(ph), 0);
+    const tip = saving() ? (auto ? btn.dataset.tipAuto : btn.dataset.tipOn)! : btn.dataset.tipOff!;
+    setTip(btn, saving() && kb ? `${tip}. ${btn.dataset.saved!.replace('{kb}', String(kb))}` : tip);
   }
 }
 
-export function setSaving(on: boolean) {
+/** Switch the mode. `byHand` remembers it for the rest of this visit. */
+export function setSaving(on: boolean, byHand = true) {
   root.classList.toggle('save-data', on);
-  // Turning it off brings the site's own fonts back. Turning it on mid-visit keeps
-  // fonts that are already here: changing them would save nothing.
-  if (!on) root.classList.remove('save-fonts');
-  try {
-    localStorage.setItem(KEY, on ? 'save' : 'full');
-  } catch {
-    /* private mode: the choice lasts for this page view */
-  }
+  auto = on && !byHand;
+  if (byHand) store('session', CHOICE, on ? 'save' : 'full');
   sync();
 }
 
 btn?.addEventListener('click', () => setSaving(!saving()));
+
+/**
+ * How fast did this page arrive? Its size divided by the time from first to last byte.
+ * Null when there's nothing to measure: the page came from the phone (service worker
+ * or browser cache) or the browser doesn't say.
+ */
+function measuredSlow(): boolean | null {
+  const nav = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
+  if (!nav || nav.transferSize < 4000 || !nav.responseEnd || !nav.encodedBodySize) return null;
+  const kbps = (nav.encodedBodySize * 8) / Math.max(nav.responseEnd - nav.responseStart, 1);
+  return kbps < SLOW_KBPS;
+}
+
+/** The phone's own signals, where the browser shares them (Chrome on Android). */
+function phoneSaysSave() {
+  const c = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
+  return !!c && (!!c.saveData || /2g$/.test(c.effectiveType ?? ''));
+}
+
+function decide() {
+  if (chosen()) return; // the button's choice wins for this visit
+  const slow = measuredSlow();
+  if (slow !== null) store('local', SPEED, JSON.stringify({ slow, t: Date.now() }));
+  // The phone's data saver is the visitor's own wish; otherwise go by the measurement.
+  const on = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData || (slow ?? saving());
+  setSaving(!!on, false);
+}
 
 // Failures after this script ran (the head script marks the wrapper; we add the button).
 document.addEventListener('error', (e) => {
@@ -111,4 +162,9 @@ window.addEventListener('online', () => {
   document.querySelectorAll<HTMLElement>('[data-ph].is-failed').forEach(retry);
 });
 
+auto = saving() && !chosen();
 sync();
+decide();
+(navigator as Navigator & { connection?: EventTarget }).connection?.addEventListener('change', () => {
+  if (!chosen() && phoneSaysSave() !== saving()) setSaving(phoneSaysSave(), false);
+});

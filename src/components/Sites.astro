@@ -5,6 +5,7 @@ import { rich } from '../lib/rich';
 import { sites, maxDepth, depths } from '../data';
 import SectionHead from './SectionHead.astro';
 import Line from './Line.astro';
+import { whaleShark } from '../lib/whale-shark';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -13,6 +14,7 @@ const ticks = [0, 10, 20, 30];
 ---
 <section class="section sites deep" id="sites" data-depth={depths.sites} aria-labelledby="sites-title">
   <div class="bubbles" aria-hidden="true"></div>
+  <div class="shark-pass" aria-hidden="true" set:html={whaleShark} />
   <div class="container">
     <SectionHead lang={lang} id="sites" depth={depths.sites} kicker={d.kicker} title={d.title} lead={d.lead} />
 

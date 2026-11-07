@@ -21,7 +21,7 @@ const rows = (['sharks', 'mantas', 'whales'] as const).map((k) => ({ key: k, nam
     <div class="seasons-top">
       <SectionHead lang={lang} id="seasons" depth={depths.seasons} kicker={d.kicker} title={d.title} lead={d.lead} />
       <figure class="whale reveal">
-        <Photo photo="humpback" widths={[400, 640, 750, 960]} ratio={0.5625} sizes="(min-width: 960px) 420px, 92vw" alt={d.photoAlt} />
+        <Photo photo="humpback" widths={[400, 640, 750, 960]} ratio={0.5625} sizes="(min-width: 1024px) 420px, 92vw" alt={d.photoAlt} />
         <figcaption><Line name="alert-circle" /> {d.note}</figcaption>
       </figure>
     </div>

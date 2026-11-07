@@ -67,7 +67,11 @@ const links = [
           ))}
         </ul>
       </nav>
-      <p class="demo-note">{f.demo}</p>
+      <p class="demo-note">
+        {f.demo} {f.demoIdea}{' '}
+        <a href={`${club.repo}/issues/new?template=idea.yml`} rel="noopener">{f.demoSuggest}</a> ·{' '}
+        <a href={club.repo} rel="noopener">{f.demoRepo}</a>
+      </p>
       <p>
         {f.photos}:{' '}
         {credits.map((p, i) => <>{i > 0 && ', '}<a href={p.url} rel="noopener" aria-label={d.hero.creditLabel.replace('{by}', p.by)}>{p.by}</a></>)}

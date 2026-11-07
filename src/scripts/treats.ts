@@ -130,19 +130,20 @@ document.addEventListener('tdc:logged', (e) => {
   }
 });
 
-// 7. At the very bottom, a humpback glides past (at most every 40 seconds).
-const whale = document.querySelector<HTMLElement>('.whale-pass');
-const footer = document.querySelector('.site-footer');
-if (whale && footer && 'IntersectionObserver' in window) {
+// 7. Big animals swim past once their stretch of the page comes into view, and
+// again on a later visit to it (at most every 40 seconds). A whale shark cruises
+// along the surface at the dive sites; at the very bottom, a humpback glides past.
+function swimPast(animal: HTMLElement | null, watch: Element | null, options: IntersectionObserverInit) {
+  if (!animal || !watch || !('IntersectionObserver' in window)) return;
   let last = -Infinity;
-  new IntersectionObserver(
-    ([entry]) => {
-      if (!entry.isIntersecting || !motionOn() || performance.now() - last < 40000) return;
-      last = performance.now();
-      whale.classList.remove('is-swimming');
-      void whale.offsetWidth;
-      whale.classList.add('is-swimming');
-    },
-    { threshold: 0.25 },
-  ).observe(footer);
+  new IntersectionObserver(([entry]) => {
+    if (!entry.isIntersecting || !motionOn() || performance.now() - last < 40000) return;
+    last = performance.now();
+    animal.classList.remove('is-swimming');
+    void animal.offsetWidth;
+    animal.classList.add('is-swimming');
+  }, options).observe(watch);
 }
+// The shark starts once the top of the section is a third of the way up the screen.
+swimPast(document.querySelector('.shark-pass'), document.querySelector('.sites'), { rootMargin: '0px 0px -35% 0px' });
+swimPast(document.querySelector('.whale-pass'), document.querySelector('.site-footer'), { threshold: 0.25 });

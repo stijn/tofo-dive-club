@@ -29,18 +29,16 @@
   --radius: 18px;
   --radius-lg: 28px;
   --shadow: 0 1px 2px rgb(4 25 42 / 0.06), 0 18px 40px -18px rgb(4 25 42 / 0.35);
-  --font-display: 'Fraunces Variable', Georgia, 'Times New Roman', serif;
-  --font-body: 'Manrope Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /* The phone's own fonts: nothing to download, and text shows at once.
+     Headings: New York on iPhone and Mac, Georgia on Windows, Noto Serif on Android.
+     Body: San Francisco, Segoe UI, Roboto. */
+  --font-display: ui-serif, Georgia, 'Noto Serif', 'Times New Roman', serif;
+  --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans', 'Helvetica Neue', Arial, sans-serif;
   --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
   --gutter: clamp(16px, 4vw, 40px);
   --max: 1200px;
   --header-h: 72px;
   --target: 44px;
-}
-/* Data saver mode: the phone's own fonts, so no font files are downloaded. */
-:root.save-fonts {
-  --font-display: Georgia, 'Times New Roman', serif;
-  --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
 
 *,
@@ -86,7 +84,6 @@ h3 {
   font-weight: 600;
   line-height: 1.05;
   letter-spacing: -0.02em;
-  font-variation-settings: 'SOFT' 100, 'WONK' 0;
   text-wrap: balance;
 }
 
@@ -357,7 +354,8 @@ ol {
   z-index: -1;
   background:
     linear-gradient(180deg, rgb(4 25 42 / 0.55) 0%, rgb(4 25 42 / 0.1) 22%, rgb(4 25 42 / 0.35) 45%, rgb(4 25 42 / 0.9) 100%),
-    linear-gradient(90deg, rgb(4 25 42 / 0.78) 0%, rgb(4 25 42 / 0.6) 45%, rgb(4 25 42 / 0) 78%);
+    /* Wide enough to sit behind the longest headline line, "the coast of giants" (AAA). */
+    linear-gradient(90deg, rgb(4 25 42 / 0.78) 0%, rgb(4 25 42 / 0.62) 55%, rgb(4 25 42 / 0) 88%);
 }
 .hero-place {
   display: inline-flex;
@@ -378,13 +376,14 @@ ol {
   color: var(--coral);
 }
 .hero-title {
-  max-width: 11ch;
+  max-width: 14ch;
   margin: 1.25rem 0;
   font-size: clamp(2.9rem, 1.4rem + 6.4vw, 6.75rem);
   line-height: 0.96;
-  font-variation-settings: 'SOFT' 100, 'WONK' 1, 'opsz' 144;
 }
 .hero-title em {
+  /* Keeps "coast of giants" on one line where it fits, and wraps inside it where it doesn't. */
+  display: inline-block;
   color: var(--sun);
   font-style: italic;
   font-weight: 500;
@@ -2341,7 +2340,9 @@ html:has(.is-open) .smb-float {
   height: var(--size);
   color: rgb(8 30 48 / 0.55);
   filter: drop-shadow(0 6px 10px rgb(0 0 0 / 0.25));
-  animation: manta-pass 7s ease-in-out forwards;
+  /* "both": while a manta waits for its turn it already sits off-screen to the left,
+     so none of them flashes up in the middle of the page before swimming in. */
+  animation: manta-pass 7s ease-in-out both;
 }
 .fx-manta svg {
   display: block;
@@ -2361,7 +2362,7 @@ html:has(.is-open) .smb-float {
 }
 @keyframes manta-pass {
   from {
-    transform: translate(-30vw, 0) rotate(-3deg);
+    transform: translate(calc(-100% - 40px), 0) rotate(-3deg);
   }
   to {
     transform: translate(130vw, -14vh) rotate(-7deg);
@@ -2566,6 +2567,25 @@ html:has(.is-open) .smb-float {
   accent-color: var(--sun);
 }
 
+/* Switching language (or any other page change) cross-fades instead of flashing white.
+   The header and depth gauge stay put while the page beneath them changes. Chrome, Edge
+   and Safari 18.2+; other browsers switch as before. Off for reduced motion, and the
+   head script in Base.astro skips it while animations are paused. */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+}
+.site-header {
+  view-transition-name: site-header;
+}
+.gauge {
+  view-transition-name: depth-gauge;
+}
+::view-transition-group(root) {
+  animation-duration: 0.35s;
+}
+
 /* Off-screen sections pause their loops (src/scripts/offscreen.ts) */
 .is-offscreen *,
 .is-offscreen *::before,
@@ -2623,6 +2643,8 @@ html:has(.is-open) .smb-float {
 .motion-off .fx-layer,
 .motion-off .glider,
 .motion-off .school,
+.motion-off .shark-pass,
+.motion-off .whale-pass,
 .motion-off .hero-caustics {
   display: none;
 }
@@ -2902,7 +2924,6 @@ h2 .kw,
   color: #0b6560;
   font-style: italic;
   font-weight: 500;
-  font-variation-settings: 'SOFT' 100, 'WONK' 1;
 }
 .deep h2 .kw,
 .lost h1 .kw,
@@ -3095,6 +3116,122 @@ h2 .kw,
   }
 }
 
+/* A whale shark cruising along the surface of the dive sites ---------- */
+/* Whale sharks feed at the surface, so it swims through the top of the first deep
+   section, right under the waves, behind the text. src/scripts/treats.ts starts it. */
+.shark-pass {
+  position: absolute;
+  top: clamp(4px, 1.2vw, 18px);
+  left: 0;
+  width: clamp(270px, 36vw, 500px);
+  color: #0b2f45;
+  opacity: 0;
+  pointer-events: none;
+}
+.shark-pass svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.shark-pass .belly {
+  fill: #cfe6ee;
+  opacity: 0.16;
+}
+.shark-pass .ridges,
+.shark-pass .stripes {
+  fill: none;
+  stroke: #cfe9f0;
+  stroke-width: 0.55;
+  stroke-linecap: round;
+  opacity: 0.3;
+}
+.shark-pass .gills,
+.shark-pass .mouth {
+  fill: none;
+  stroke: var(--abyss);
+  stroke-width: 0.9;
+  stroke-linecap: round;
+  opacity: 0.6;
+}
+.shark-pass .mouth {
+  stroke-width: 1.1;
+}
+.shark-pass .spots {
+  fill: #d8f0f4;
+  opacity: 0.72;
+}
+.shark-pass .eye {
+  fill: var(--abyss);
+}
+.shark-pass .pec {
+  fill: #0e3550;
+}
+.shark-pass .pilot {
+  color: #3d7894;
+}
+.shark-pass.is-swimming {
+  animation: shark-pass 36s linear forwards;
+}
+.shark-pass.is-swimming svg {
+  animation: shark-bob 9s ease-in-out infinite;
+}
+/* Seen from the side, a tail sweeping left and right looks narrower at each end of
+   the sweep, so the beat is a squeeze around the base of the tail. */
+.shark-pass .tail {
+  transform-box: view-box;
+  transform-origin: 48px 40px;
+  animation: shark-tail 3.2s ease-in-out infinite;
+}
+.shark-pass .pec {
+  transform-box: view-box;
+  transform-origin: 183px 57px;
+  animation: shark-pec 6.4s ease-in-out infinite;
+}
+.shark-pass .pilot {
+  animation: pilot 2.2s ease-in-out infinite alternate;
+}
+@keyframes shark-pass {
+  0% {
+    opacity: 0;
+    transform: translateX(calc(-100% - 20px));
+  }
+  5%,
+  94% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(calc(100vw + 20px));
+  }
+}
+@keyframes shark-bob {
+  50% {
+    transform: translateY(8px) rotate(0.6deg);
+  }
+}
+@keyframes shark-tail {
+  25% {
+    transform: scaleX(0.6) rotate(3deg);
+  }
+  50% {
+    transform: none;
+  }
+  75% {
+    transform: scaleX(0.6) rotate(-3deg);
+  }
+}
+@keyframes shark-pec {
+  50% {
+    transform: rotate(-4deg);
+  }
+}
+@keyframes pilot {
+  to {
+    transform: translate(2px, -1.2px);
+  }
+}
+
 /* A humpback at the bottom of the page --------------------------------- */
 .glossary {
   padding-bottom: clamp(150px, 15vw, 220px);
@@ -3149,6 +3286,135 @@ h2 .kw,
 @keyframes fluke-beat {
   50% {
     transform: rotate(10deg);
+  }
+}
+
+/* Little moments ---------------------------------------------------------
+   Small surprises that reward pointing, ticking and scrolling. All of them stop with
+   the pause button and the phone's reduce-motion setting (the .motion-off rules), and
+   none downloads anything. */
+
+/* Light through the water: pointing at a photo sends a soft beam of sun across it. */
+@media (hover: hover) {
+  .card .ph::after,
+  .club-media .ph::after,
+  .whale .ph::after {
+    content: '';
+    position: absolute;
+    inset: -20% -60%;
+    background: linear-gradient(105deg, transparent 38%, rgb(255 255 255 / 0.22) 47%, rgb(255 246 214 / 0.32) 50%, rgb(255 255 255 / 0.22) 53%, transparent 62%);
+    transform: translateX(-30%);
+    pointer-events: none;
+  }
+  .card:hover .ph::after,
+  .club-media .ph:hover::after,
+  .whale .ph:hover::after {
+    animation: sunbeam 1s ease-in-out;
+  }
+}
+@keyframes sunbeam {
+  to {
+    transform: translateX(30%);
+  }
+}
+
+/* Card and stat icons give a little nudge when you point at their card. */
+@media (hover: hover) {
+  .card:hover .card-icon .icon,
+  .stat:hover .stat-icon .icon {
+    animation: nudge 0.7s ease-in-out;
+  }
+}
+@keyframes nudge {
+  30% {
+    transform: translateX(3px) rotate(-8deg);
+  }
+  60% {
+    transform: translateX(-2px) rotate(5deg);
+  }
+}
+
+/* Ticking a chip in the form: it pops, and a bubble rises from it. */
+.chip input:checked + span {
+  animation: chip-pop 0.35s cubic-bezier(0.2, 1.6, 0.4, 1);
+}
+.chip span::after {
+  content: '';
+  position: absolute;
+  right: 10px;
+  top: -2px;
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--reef-ui);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+}
+.chip input:checked + span::after {
+  animation: chip-bubble 0.9s ease-out;
+}
+@keyframes chip-pop {
+  50% {
+    transform: scale(1.08);
+  }
+}
+@keyframes chip-bubble {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(0.5);
+  }
+  60% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(5px, -30px) scale(1.2);
+  }
+}
+
+/* An answer floats up into place as its question opens. */
+.faq-item[open] > p {
+  animation: float-in 0.4s ease-out;
+}
+@keyframes float-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* Following a dive word link: the word you land on glows for a moment. */
+.word:target {
+  animation: landed 1.6s ease-out;
+}
+@keyframes landed {
+  0% {
+    box-shadow: 0 0 0 0 rgb(255 210 122 / 0.55);
+    background: rgb(255 210 122 / 0.22);
+  }
+}
+
+/* The depth gauge gives a small bounce each time you pass another 10 metres. */
+.gauge-readout {
+  display: inline-block;
+}
+.gauge-readout.is-tick {
+  animation: tick 0.45s cubic-bezier(0.2, 1.6, 0.4, 1);
+}
+
+/* Without JavaScript there's no pause button, so the phone's reduce-motion setting
+   stops every animation. (With it, the head script in Base.astro does the same.) */
+@media (prefers-reduced-motion: reduce) {
+  html:not(.js) *,
+  html:not(.js) *::before,
+  html:not(.js) *::after {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+@keyframes tick {
+  50% {
+    transform: scale(1.25);
   }
 }
 

@@ -4,8 +4,6 @@ import { htmlLang, type Lang } from '../config';
 import { t } from '../i18n';
 import Mark from './Mark.astro';
 import Line from './Line.astro';
-import Fa from './Fa.astro';
-import { faFeather } from '@fortawesome/free-solid-svg-icons';
 
 interface Props { lang: Lang; minimal?: boolean }
 const { lang, minimal = false } = Astro.props;
@@ -41,6 +39,8 @@ const links = [
           aria-pressed="false"
           data-tip={d.data.tipOff}
           data-tip-on={d.data.tipOn}
+          data-tip-auto={d.data.tipAuto}
+          data-saved={d.data.saved}
           data-tip-off={d.data.tipOff}
           data-show={d.data.show}
           data-failed={d.data.failed}
@@ -48,7 +48,9 @@ const links = [
           data-data-btn
         >
           <span class="visually-hidden">{d.data.label}</span>
-          <Fa icon={faFeather} />
+          {/* Android's own Data Saver icon (Material Symbols "data_saver_on", Apache 2.0): the
+              one most phones in Mozambique show in their quick settings. */}
+          <svg class="icon" viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 22q-2.075 0-3.9-.788t-3.175-2.15t-2.137-3.187T2 12q0-3.925 2.6-6.75t6.4-3.2v3q-2.575.35-4.288 2.313T5 12q0 2.9 2.05 4.95T12 19q1.65 0 3.088-.7t2.412-1.9l2.6 1.5q-1.35 1.875-3.475 2.988T12 22m-1-6v-3H8v-2h3V8h2v3h3v2h-3v3zm10.15.05l-2.6-1.5q.225-.6.337-1.237T19 12q0-2.675-1.713-4.637T13 5.05v-3q3.8.375 6.4 3.2T22 12q0 1.1-.2 2.125t-.65 1.925"/></svg>
         </button>
         <button class="icon-btn motion-btn" type="button" aria-pressed="false" data-tip={d.motion.pause} data-tip-describe="false" data-label-pause={d.motion.pause} data-label-play={d.motion.play} data-motion-btn>
           <span class="visually-hidden">{d.motion.pause}</span>
@@ -92,7 +94,9 @@ const links = [
   const headerH = () => header.getBoundingClientRect().height;
 
   const onScroll = () => header.classList.toggle('is-scrolled', window.scrollY > 24);
-  onScroll();
+  // First reads wait for the next frame: reading the scroll position now, while the page
+  // is still being set up, would force an extra layout of the whole page.
+  requestAnimationFrame(onScroll);
   window.addEventListener('scroll', onScroll, { passive: true });
 
   // Mobile menu ------------------------------------------------------
@@ -139,7 +143,7 @@ const links = [
       for (const s of spyTargets) if (s.getBoundingClientRect().top <= line) current = s.id;
       spyLinks.forEach((a) => (a.dataset.spy === current ? a.setAttribute('aria-current', 'true') : a.removeAttribute('aria-current')));
     };
-    spy();
+    requestAnimationFrame(spy);
     window.addEventListener('scroll', spy, { passive: true });
   }
 
@@ -156,12 +160,17 @@ const links = [
     if (r.top < top) window.scrollBy({ top: r.top - top, behavior: 'instant' as ScrollBehavior });
   });
 
-  // Keep the visitor's place when switching language.
-  document.querySelector<HTMLAnchorElement>('[data-lang-switch]')?.addEventListener('click', (e) => {
-    const a = e.currentTarget as HTMLAnchorElement;
+  // Keep the visitor's place when switching language. The link points at the section in
+  // view as soon as the pointer or focus reaches it, so the page loaded in advance (the
+  // speculation rules in Base.astro) is the one that will open.
+  const langLink = document.querySelector<HTMLAnchorElement>('[data-lang-switch]');
+  const aim = () => {
+    if (!langLink) return;
     const current = [...document.querySelectorAll<HTMLElement>('main section[id]')]
       .filter((s) => s.getBoundingClientRect().top < window.innerHeight / 2)
       .pop();
-    if (current) a.href = a.href.split('#')[0] + '#' + current.id;
-  });
+    const url = langLink.href.split('#')[0] + (current ? '#' + current.id : '');
+    if (langLink.href !== url) langLink.href = url;
+  };
+  for (const type of ['pointerenter', 'pointerdown', 'focus', 'click']) langLink?.addEventListener(type, aim);
 </script>

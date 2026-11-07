@@ -8,6 +8,9 @@ const showNote = () => {
 };
 window.addEventListener('online', showNote);
 window.addEventListener('offline', showNote);
+// Back and Forward show the page straight from the browser's memory (the back/forward
+// cache), exactly as it was left; the signal may have changed in the meantime.
+window.addEventListener('pageshow', (e) => e.persisted && showNote());
 showNote();
 
 if ('serviceWorker' in navigator && import.meta.env.PROD) {

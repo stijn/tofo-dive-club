@@ -18,6 +18,41 @@ Every change to the site is logged here, newest first. Add to it in the same com
 - Another language (French or German are the likeliest) once the join form's "preferred language" answers show demand.
 - Club photos: replace the masters in `src/assets/photos/` (same file names) and update the credits.
 
+## 0.6.0 · 2026-11-07
+
+No font files, a whale shark, a headline that matches its photo, a data saver that decides for itself, a smoother language switch, and small moments of delight. Measured like 0.5.0 (throttled slow 3G, first visit, data saver off), against the live 0.5.0:
+
+| | 0.5.0 | 0.6.0 |
+| --- | --- | --- |
+| First screen | 434 KB | 146 KB |
+| Whole page, scrolled to the bottom | 632 KB | 344 KB |
+| The same, letting data saver decide (it switches on over slow 3G) | 632 KB | 146 KB |
+| Largest paint (Google's LCP) | 4.0 s | 0.9 s |
+
+Lighthouse: 100 for accessibility, best practices and SEO on mobile and desktop; performance 99 on mobile, 100 on desktop.
+
+**Speed and fonts**
+- **No font files.** The site uses the phone's own fonts: New York on iPhone and Mac, Georgia on Windows and Noto Serif on Android for headings, and the system sans for text. Compared side by side as they render on each, they hold up, and they save 289 KB, two thirds of the first screen. Text no longer waits for a font, which is why the largest paint dropped to under a second.
+- **Lighthouse fixes**: the header and depth gauge no longer force a layout of the whole page while it starts up; the club photos and the humpback photo ask for the size they're shown at (the humpback was too small, so soft, on screens 960 to 1023 px wide); the whale shark's spots are one shape instead of 170.
+
+**Data saver**
+- **It decides by itself.** Once a page has arrived, the site measures how fast it came, which works in every browser. Below about 500 kbit/s data saver switches on, on wifi or good mobile data it stays off. The phone's own data saver setting always switches it on. The tooltip says why ("Slow connection, so saving data") and how much it saves on the page.
+- **The button's choice lasts for the visit.** 0.5.0 remembered it for good, so a choice made once could leave you without photos on fast home wifi. Choices saved by 0.5.0 are cleared.
+- **Android's own Data Saver icon** instead of the feather: most phones in Mozambique run Android and show this icon in their quick settings.
+
+**Look and feel**
+- **A whale shark** cruises along the surface at the top of the dive sites, where the depth chart says whale sharks feed: broad flat head, gill slits, ridges, its spot-and-stripe pattern, a tail that sweeps side to side, and three pilot fish riding its bow wave. It joins the fish on the thermocline, the manta at the seasons table and the humpback at the bottom. It swims at most every 40 seconds, and the pause button stops it.
+- **The hero headline matches its photo**: "A dive club on the coast of giants" over the whale shark, instead of "Manta Coast" over a whale shark. The coast's real name stays where people and search engines look for it: the page title, the description, the hero's first sentence ("Tofo is on Mozambique's Manta Coast…"), the footer and the structured data. The shade behind the headline is a little wider, so the longer line keeps AAA contrast over the photo.
+- **Little moments**: pointing at a photo sends a beam of sunlight across it; card and stat icons give a nudge; each section's depth label ticks up from the one above as you reach it; the depth gauge bounces at every 10 m; form chips pop with a bubble; FAQ answers float in; a dive word you jump to glows. All of them stop with the pause button and the phone's reduce-motion setting (also without JavaScript).
+- **Smoother language switch**: the page cross-fades while the header and depth gauge stay put (Chrome, Edge, Safari 18.2+; skipped while animations are paused). Hovering over or touching the switch loads the other language in advance, so it opens at once (Chrome, Edge; not in data saver mode). Back and Forward come straight from the browser's back/forward cache, checked by a test.
+- **Fixed: the "manta" easter egg spoiled its own surprise.** The second and third mantas wait their turn before swimming in, and during that wait they sat in plain view. They now wait off-screen.
+- **Fixed: no icon in Safari.** Safari 27 picks the SVG icon, which had no size of its own, and showed a letter instead. The SVG now has one, and the icon links carry a version (`?v=2`) so Safari fetches them again instead of trusting its cache.
+
+**Working on the site**
+- **GitHub links in the demo notice**: "Suggest it on GitHub" opens a short form for ideas, in English and Portuguese (`.github/ISSUE_TEMPLATE/idea.yml`), and "The project on GitHub" opens the code and plans. Sending an idea needs a free GitHub account.
+- **New share images** with the new headline and a faint whale shark. `tools/og/make.mjs` makes them, so they can be remade when the words change.
+- **Tests**: `npm run test:ui` now also checks the whale shark, the easter-egg mantas starting off-screen, no font files, data saver switching itself on over slow 3G and off on a fast line, the language switch (aimed at the section in view, loaded in advance, cross-fading, back/forward cache), the depth labels and the saved-data count. Animal checks wait for the animation to start instead of a fixed time, which made them fail now and then on a busy machine. `npm run perf` keeps data saver off unless you pass `--save` or `--auto`, so releases compare like with like.
+
 ## 0.5.0 · 2026-11-07
 
 Built for patchy mobile data. Measured on a throttled slow 3G phone connection (400 kbit/s, 400 ms), first visit, against 0.4.1:
@@ -126,6 +161,9 @@ First MVP, live as a demo on GitHub Pages.
 - Online booking and payments: dives are run and sold by licensed dive centres, not the club.
 - Naming or comparing competitors on the site: the market scan stays private; the site only states what the club promises.
 - A CMS or backend: the content changes rarely, and editing two TypeScript files is enough for now.
-- Trimming the fonts (fixing Fraunces' unused axes, about 130 KB less): not chosen for now, so the fonts stay as designed. Fonts are now the largest part of a first visit; data saver mode skips them.
+- Web fonts (Fraunces and Manrope until 0.6.0): dropped. The phone's own fonts look nearly as good and save 289 KB on a first visit. If the club ever wants its own look back, one small heading font is worth adding, not the old full set.
+- Machine translation into Gitonga: no tool covers it. Glosbe's English–Gitonga dictionary has no entries in either direction, and its "automatic translator" page doesn't exist for this pair (checked again for 0.6.0).
+- Other data saver icons: a feather (unclear, and odd on a diving site), a lightning bolt (reads as "fast", not "light"), a weak or broken wifi signal (reads as "no connection", which the "No signal" note already covers, and would make the site look broken when data saver switches on by itself). The Noun Project's "wifi error" icon would also need a credit or a paid licence.
+- Longer cache lifetimes, as Lighthouse suggests: GitHub Pages fixes them at 10 minutes. The service worker already makes repeat visits free. Revisit with the club's own domain and host.
 - Reusing repeated icons through an SVG sprite: measured at 1.5 KB saved after compression, not worth the extra code.
 - Moving hosting from GitHub Pages (to Cloudflare Pages, for Brotli and HTTP/3): not now. With offline saving the host matters less. Revisit with the club's own domain.

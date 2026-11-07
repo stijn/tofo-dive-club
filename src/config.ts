@@ -11,6 +11,9 @@ export const club = {
   instagram: '', // full URL
   facebook: '', // full URL
   map: 'https://www.openstreetmap.org/?mlat=-23.8525&mlon=35.5465#map=15/-23.8525/35.5465',
+  // The site's code and plans. The demo notice in the footer links here, and to a form
+  // for ideas (.github/ISSUE_TEMPLATE/idea.yml). Remove the notice at launch.
+  repo: 'https://github.com/stijn/tofo-dive-club',
 };
 
 export type Lang = 'en' | 'pt' | 'toh';

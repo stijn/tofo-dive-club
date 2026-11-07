@@ -5,6 +5,9 @@
 //   --scroll  also scroll to the bottom, so lazy images load
 //   --repeat  load a second time with a warm cache and report that too
 //   --save    with the site's data saver mode switched on
+//   --auto    let the site decide on data saver mode by itself (from 0.6.0 it measures
+//             the connection, so on slow 3G it switches on). Without --save or --auto
+//             it's kept off, so releases compare like with like.
 //   --timeline  list every request with its start and end
 import { spawn } from 'node:child_process';
 import { mkdtempSync } from 'node:fs';
@@ -18,6 +21,7 @@ const doScroll = args.includes('--scroll');
 const doRepeat = args.includes('--repeat');
 const doTimeline = args.includes('--timeline');
 const doSave = args.includes('--save'); // data saver mode on
+const doAuto = args.includes('--auto'); // the site decides
 const profiles = {
   slow3g: { latency: 400, downloadThroughput: (400 * 1024) / 8, uploadThroughput: (400 * 1024) / 8 },
   '3g': { latency: 150, downloadThroughput: (1.6 * 1024 * 1024) / 8, uploadThroughput: (750 * 1024) / 8 },
@@ -49,7 +53,11 @@ await send('Page.enable');
 await send('Network.enable');
 await send('Emulation.setDeviceMetricsOverride', { width: 375, height: 812, deviceScaleFactor: 2, mobile: true });
 await send('Network.emulateNetworkConditions', { offline: false, ...profiles[profile] });
-if (doSave) await send('Page.addScriptToEvaluateOnNewDocument', { source: `try { localStorage.setItem('tdc-data', 'save') } catch (e) {}` });
+// 0.5.0 read the choice from localStorage, 0.6.0 from sessionStorage: set both.
+if (!doAuto) {
+  const mode = doSave ? 'save' : 'full';
+  await send('Page.addScriptToEvaluateOnNewDocument', { source: `try { localStorage.setItem('tdc-data', '${mode}'); sessionStorage.setItem('tdc-data', '${mode}') } catch (e) {}` });
+}
 await send('Page.addScriptToEvaluateOnNewDocument', { source: `
   window.__perf = { fcp: 0, lcp: 0, lcpEl: '' };
   new PerformanceObserver((l) => { for (const e of l.getEntries()) if (e.name === 'first-contentful-paint') __perf.fcp = e.startTime; }).observe({ type: 'paint', buffered: true });

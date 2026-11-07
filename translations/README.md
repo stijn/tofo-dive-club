@@ -41,5 +41,5 @@ When every text is filled in, the Gitonga version goes live by itself:
 
 ## Still to do by hand when Gitonga goes live
 
-- A Gitonga preview image for sharing (`public/og/og-toh.jpg`, then point `Base.astro` at it).
+- A Gitonga preview image for sharing: add `toh` to `copy` in `tools/og/make.mjs`, run it, then point `Base.astro` at `og-toh.jpg`.
 - Check the join form's preferred-language list in `src/data.ts`. It already offers Gitonga.

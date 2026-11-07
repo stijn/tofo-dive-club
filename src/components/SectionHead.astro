@@ -10,7 +10,7 @@ const metres = t(lang).glossary.abbreviations.find((a) => a.id === 'm')!.title;
 ---
 <header class="section-head">
   <p class="kicker reveal">
-    <span class="kicker-depth">{String(depth).padStart(2, '0')} <abbr title={metres}>m</abbr></span>
+    <span class="kicker-depth"><span aria-hidden="true" data-count={depth}>{String(depth).padStart(2, '0')}</span><span class="visually-hidden">{depth}</span> <abbr title={metres}>m</abbr></span>
     <span>{kicker}</span>
   </p>
   <h2 class="reveal" id={`${id}-title`} set:html={rich(title, lang)} />
