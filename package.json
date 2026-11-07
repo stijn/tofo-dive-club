@@ -1,7 +1,7 @@
 {
   "name": "tofo-dive-club",
   "type": "module",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "private": true,
   "description": "MVP website for a community dive club in Tofo, Mozambique. English and Portuguese.",
   "engines": {

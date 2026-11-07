@@ -14,6 +14,14 @@ Every change to the site is logged here, newest first. Add to it in the same com
 - Portuguese copy reviewed by a Mozambican speaker.
 - Accessibility check with real screen-reader users (VoiceOver, TalkBack, NVDA), beyond the automated AAA audit.
 - Own domain.
+- A third language only once sign-ups show demand: add a "preferred language" question to the join form first. French or German are the likeliest candidates (see the 0.4.0 notes in the chat); the language switch would then become a small menu.
+
+## 0.4.0 · 2026-11-07
+
+- **Fixed: clicks jumped to the top.** `<main>` is focusable (the skip link's target), so a mouse click on any plain text focused it. A guard that keeps focused elements out from under the fixed header then scrolled to `<main>`'s top, which is the top of the page. This also broke the `#join` links: the next click after landing threw you back up. The guard now only acts on keyboard focus of normal-sized elements.
+- **Diving-mask cursor** over the dive-site depth chart on desktop: the 🤿 emoji, with a drawn mask image for Safari and a crosshair as last resort.
+- **A humpback at the bottom**: when you reach the footer, a humpback whale (long white pectoral fin, beating tail) glides across the empty band above it, at most every 40 seconds.
+- **Tests**: `npm run test:ui` now also checks that clicking text keeps your place, that `#join` lands under the header, the cursor and the whale.
 
 ## 0.3.1 · 2026-11-06
 

@@ -2907,3 +2907,69 @@ h2 .kw,
     overflow: visible;
   }
 }
+
+/* Depth chart cursor on desktop: the diving-mask emoji (drawn by the visitor's own
+   emoji font), then our own mask image for browsers without SVG cursors (Safari),
+   then a crosshair. Hotspot in the middle of the mask. */
+@media (min-width: 961px) and (pointer: fine) {
+  .profile {
+    cursor: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ctext x='16' y='26' font-size='26' text-anchor='middle' font-family='Apple Color Emoji,Segoe UI Emoji,Noto Color Emoji,sans-serif'%3E%F0%9F%A4%BF%3C/text%3E%3C/svg%3E") 16 16, url('../assets/cursor-mask.png') 16 16, crosshair;
+  }
+}
+
+/* A humpback at the bottom of the page --------------------------------- */
+.glossary {
+  padding-bottom: clamp(150px, 15vw, 220px);
+}
+.whale-pass {
+  position: absolute;
+  left: 0;
+  bottom: clamp(18px, 3vw, 40px);
+  width: clamp(220px, 28vw, 380px);
+  color: #17496a;
+  opacity: 0;
+  pointer-events: none;
+}
+.whale-pass svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.whale-pass .pec {
+  fill: #3f7f9e;
+}
+.whale-pass.is-swimming {
+  animation: whale-pass 28s linear forwards;
+}
+.whale-pass.is-swimming svg {
+  animation: whale-bob 7s ease-in-out infinite;
+}
+.whale-pass .fluke {
+  transform-box: view-box;
+  transform-origin: 44px 39px;
+  animation: fluke-beat 3.2s ease-in-out infinite;
+}
+@keyframes whale-pass {
+  0% {
+    opacity: 0;
+    transform: translateX(-45vw);
+  }
+  6%,
+  92% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(110vw);
+  }
+}
+@keyframes whale-bob {
+  50% {
+    transform: translateY(-10px) rotate(-1.2deg);
+  }
+}
+@keyframes fluke-beat {
+  50% {
+    transform: rotate(10deg);
+  }
+}

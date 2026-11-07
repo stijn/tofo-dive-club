@@ -26,3 +26,14 @@ export const fluke =
 // A small reef fish.
 export const fish =
   '<svg class="creature creature-fish" viewBox="0 0 24 12" aria-hidden="true" focusable="false"><path fill="currentColor" d="M22 6c-4-5-11-5-15 0 4 5 11 5 15 0Zm-15 0-5-4v8Z"/><circle cx="18.6" cy="5.2" r=".9" fill="#d8f0f4"/></svg>';
+
+// Humpback whale, side view, swimming right: long white pectoral fin, small dorsal hump,
+// a tail fluke that beats (its own group, so the animation can't undo anything else).
+export const humpback =
+  '<svg class="creature creature-humpback" viewBox="0 0 220 80" aria-hidden="true" focusable="false">' +
+  '<g class="fluke"><path fill="currentColor" d="M44 38c-8-1-14-3-20-8C18 25 10 22 3 22c4 5 8 10 14 14-6 4-10 9-14 14 7 0 15-3 21-8 6-4 12-4 20-3Z"/></g>' +
+  '<path fill="currentColor" d="M40 36c24-6 52-11 82-13 28-2 54 1 74 8 10 4 17 8 20 11-4 5-12 9-24 11-22 4-52 5-80 3-26-2-50-8-72-13Z"/>' +
+  '<path fill="currentColor" d="M88 26c4-4 8-7 12-8 0 3 1 5 4 6Z"/>' +
+  '<path class="pec" d="M172 51c-12 9-32 19-60 25-4 1-6-1-2-3 20-7 38-15 50-23Z"/>' +
+  '<path d="M214 43c-14 2-28 3-42 1M200 47c-18 4-38 5-58 5M194 50c-16 4-34 5-50 5" fill="none" stroke="#7fb3c9" stroke-width="1.2" stroke-linecap="round" opacity=".35"/>' +
+  '<circle cx="186" cy="40" r="1.8" fill="#7fb3c9" opacity=".7"/></svg>';

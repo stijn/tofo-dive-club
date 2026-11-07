@@ -126,9 +126,13 @@ const links = [
   }
 
   // Never let the fixed header cover the focused element (2.4.12)
+  // Only for keyboard focus on normal-sized elements: a mouse click on plain text
+  // focuses <main> (it's the skip link's target), and scrolling to *its* top
+  // used to throw the reader back to the top of the page.
   document.addEventListener('focusin', (e) => {
     const el = e.target as HTMLElement;
-    if (!el || header.contains(el)) return;
+    if (!el || header.contains(el) || !el.matches(':focus-visible')) return;
+    if (el === document.getElementById('main') || el.offsetHeight > window.innerHeight * 0.6) return;
     const r = el.getBoundingClientRect();
     const top = headerH() + 12;
     if (r.top < top) window.scrollBy({ top: r.top - top, behavior: 'instant' as ScrollBehavior });

@@ -23,11 +23,12 @@ async function browser(width, height = 860) {
   await send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: width < 768 });
   const ev = async (e) => (await send('Runtime.evaluate', { expression: e, awaitPromise: true, returnByValue: true })).result.result?.value;
   const move = (x, y) => send('Input.dispatchMouseEvent', { type: 'mouseMoved', x, y });
+  const click = async (x, y) => { for (const type of ['mousePressed', 'mouseReleased']) await send('Input.dispatchMouseEvent', { type, x, y, button: 'left', clickCount: 1 }); };
   const key = (k, code = 27) => send('Input.dispatchKeyEvent', { type: 'keyDown', key: k, code: k, windowsVirtualKeyCode: code });
   const rect = (sel) => ev(`(() => { const r = document.querySelector(${JSON.stringify(sel)}).getBoundingClientRect(); return {x: r.x, y: r.y, w: r.width, h: r.height}; })()`);
   const go = async (path) => { await send('Page.navigate', { url: base + path }); await sleep(2800); };
   const scrollTo = async (sel, off = 120) => { await ev(`window.scrollTo({top: document.querySelector(${JSON.stringify(sel)}).getBoundingClientRect().top + scrollY - ${off}, behavior: 'instant'}); 1`); await sleep(800); };
-  return { ev, move, key, rect, go, scrollTo, errors, close: () => { ws.close(); chrome.kill(); } };
+  return { ev, move, click, key, rect, go, scrollTo, errors, close: () => { ws.close(); chrome.kill(); } };
 }
 
 // Desktop --------------------------------------------------------------
@@ -45,6 +46,19 @@ async function browser(width, height = 860) {
   check('pause button pauses everything', await b.ev(`document.documentElement.classList.contains('motion-off') && document.querySelector('[data-motion-btn]').dataset.tip === 'Play animations'`));
   await b.ev(`document.querySelector('[data-motion-btn]').click(); 1`); await sleep(200);
   await b.move(5, 600);
+
+  // Clicking plain text must never move the page (it used to jump to the top).
+  await b.scrollTo('#seasons .lead', 300);
+  let y0 = await b.ev('scrollY');
+  r = await b.rect('#seasons .lead'); await b.click(r.x + r.w / 2, r.y + r.h / 2); await sleep(700);
+  check('clicking text keeps your place', Math.abs((await b.ev('scrollY')) - y0) < 5, `${y0} → ${await b.ev('scrollY')}`);
+  await b.ev(`window.scrollTo({ top: 0, behavior: 'instant' }); 1`); await sleep(400);
+  r = await b.rect('.hero-actions a[href="#join"]'); await b.click(r.x + r.w / 2, r.y + r.h / 2); await sleep(2500);
+  const joinTop = () => b.ev(`Math.round(document.getElementById('join').getBoundingClientRect().top)`);
+  check('"Join" lands just under the header', Math.abs((await joinTop()) - 72) < 12, `${await joinTop()}px`);
+  r = await b.rect('#join .lead'); await b.click(r.x + r.w / 2, r.y + r.h / 2); await sleep(700);
+  check('and clicking there keeps your place', Math.abs((await joinTop()) - 72) < 12, `${await joinTop()}px`);
+  check('depth chart has the diving-mask cursor', /svg\+xml.*image\/png/.test(await b.ev(`getComputedStyle(document.querySelector('.profile')).cursor`)));
 
   await b.scrollTo('#sites', 60);
   check('nav marks the section in view', await b.ev(`document.querySelector('[data-spy="sites"]').getAttribute('aria-current') === 'true'`));
@@ -73,6 +87,9 @@ async function browser(width, height = 860) {
 
   await b.ev(`document.body.focus(); for (const k of 'manta') document.dispatchEvent(new KeyboardEvent('keydown', { key: k, bubbles: true })); 1`); await sleep(200);
   check('typing "manta" releases mantas', (await b.ev(`document.querySelectorAll('.fx-manta').length`)) === 3);
+
+  await b.ev(`window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }); 1`); await sleep(1200);
+  check('a whale swims past at the bottom', await b.ev(`document.querySelector('.whale-pass').classList.contains('is-swimming')`));
 
   // Ascent: record scrollY every frame and check it only ever moves up, without jumps.
   await b.ev(`window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }); 1`); await sleep(500);

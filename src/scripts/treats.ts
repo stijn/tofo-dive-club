@@ -129,3 +129,20 @@ document.addEventListener('tdc:logged', (e) => {
     setTimeout(() => puff(r.left + r.width / 2 + rand(-30, 30), r.top + rand(0, r.height), rand(6, 14)), i * 45);
   }
 });
+
+// 7. At the very bottom, a humpback glides past (at most every 40 seconds).
+const whale = document.querySelector<HTMLElement>('.whale-pass');
+const footer = document.querySelector('.site-footer');
+if (whale && footer && 'IntersectionObserver' in window) {
+  let last = -Infinity;
+  new IntersectionObserver(
+    ([entry]) => {
+      if (!entry.isIntersecting || !motionOn() || performance.now() - last < 40000) return;
+      last = performance.now();
+      whale.classList.remove('is-swimming');
+      void whale.offsetWidth;
+      whale.classList.add('is-swimming');
+    },
+    { threshold: 0.25 },
+  ).observe(footer);
+}
