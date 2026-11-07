@@ -95,3 +95,16 @@ export const termIcons: Record<string, IconDefinition> = {
   wetsuit: faShirt,
 };
 export const groupIcons: Record<string, IconDefinition> = { boat: faBoat, water: faWaves, learn: faLearn };
+
+// Join form: preferred language. Each name is written in its own language.
+// Gitonga is the local language around Tofo (ISO 639-3 "toh").
+export const formLanguages = [
+  { value: 'en', name: 'English', lang: 'en' },
+  { value: 'pt', name: 'Português', lang: 'pt' },
+  { value: 'af', name: 'Afrikaans', lang: 'af' },
+  { value: 'de', name: 'Deutsch', lang: 'de' },
+  { value: 'es', name: 'Español', lang: 'es' },
+  { value: 'fr', name: 'Français', lang: 'fr' },
+  { value: 'toh', name: 'Gitonga', lang: 'toh' },
+  { value: 'nl', name: 'Nederlands', lang: 'nl' },
+] as const;

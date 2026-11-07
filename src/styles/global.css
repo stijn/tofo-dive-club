@@ -2973,3 +2973,8 @@ h2 .kw,
     transform: rotate(10deg);
   }
 }
+
+/* The "which language?" field lines up with the select beside it. */
+.field-end {
+  align-self: end;
+}

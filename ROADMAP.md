@@ -14,7 +14,11 @@ Every change to the site is logged here, newest first. Add to it in the same com
 - Portuguese copy reviewed by a Mozambican speaker.
 - Accessibility check with real screen-reader users (VoiceOver, TalkBack, NVDA), beyond the automated AAA audit.
 - Own domain.
-- A third language only once sign-ups show demand: add a "preferred language" question to the join form first. French or German are the likeliest candidates (see the 0.4.0 notes in the chat); the language switch would then become a small menu.
+- A third language once the join form's "preferred language" answers show demand. French or German are the likeliest; the language switch would then become a small menu.
+
+## 0.4.1 · 2026-11-07
+
+- **Preferred language** in the join form: English, Português, Afrikaans, Deutsch, Español, Français, Gitonga, Nederlands, or "another language" with a text field. Defaults to the page's language, each option is marked with its own language for screen readers, and the answer is added to the WhatsApp or email message. This tells the club which third language, if any, is worth adding.
 
 ## 0.4.0 · 2026-11-07
 

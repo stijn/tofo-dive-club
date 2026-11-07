@@ -1,7 +1,7 @@
 ---
 import { club, type Lang } from '../config';
 import { t } from '../i18n';
-import { depths } from '../data';
+import { depths, formLanguages } from '../data';
 import SectionHead from './SectionHead.astro';
 import Line from './Line.astro';
 import Fa from './Fa.astro';
@@ -15,7 +15,7 @@ const f = d.form;
 const stepIcons = ['account-add', 'chat-round-dots', 'water'];
 const strings = {
   name: f.name, email: f.email, cert: f.cert, dives: f.dives, stay: f.stay,
-  dates: f.dates, interests: f.interests, message: f.message,
+  dates: f.dates, interests: f.interests, message: f.message, language: f.language,
   intro: f.intro, subject: f.subject,
 };
 ---
@@ -100,6 +100,20 @@ const strings = {
           ))}
         </div>
       </fieldset>
+      <div class="field-row">
+        <div class="field">
+          <label for="f-language">{f.language}</label>
+          <p class="hint" id="f-language-hint">{f.languageHint}</p>
+          <select id="f-language" name="language" aria-describedby="f-language-hint">
+            {formLanguages.map((l) => <option value={l.value} lang={l.lang} selected={l.value === lang}>{l.name}</option>)}
+            <option value="other">{f.languageOther}</option>
+          </select>
+        </div>
+        <div class="field field-end" data-language-other hidden>
+          <label for="f-language-other">{f.languageOtherLabel}</label>
+          <input id="f-language-other" name="languageOther" autocomplete="off" />
+        </div>
+      </div>
       <div class="field">
         <label for="f-message">{f.message} <span class="opt">({f.optional})</span></label>
         <p class="hint" id="f-message-hint">{f.messageHint}</p>
@@ -143,6 +157,13 @@ const strings = {
   form.addEventListener('change', syncDates);
   syncDates();
 
+  // "Another language" opens a text field for it.
+  const language = form.elements.namedItem('language') as HTMLSelectElement;
+  const languageOther = form.querySelector<HTMLElement>('[data-language-other]')!;
+  const syncLanguage = () => (languageOther.hidden = language.value !== 'other');
+  language.addEventListener('change', syncLanguage);
+  syncLanguage();
+
   const setError = (on: boolean) => {
     nameError.hidden = !on;
     if (on) name.setAttribute('aria-invalid', 'true');
@@ -169,6 +190,7 @@ const strings = {
     add(s.stay, String(data.get('stay') ?? ''));
     if (!dates.hidden) add(s.dates, String(data.get('dates') ?? ''));
     add(s.interests, data.getAll('interests').join(', '));
+    add(s.language, language.value === 'other' ? String(data.get('languageOther') ?? '') : language.selectedOptions[0].text);
     add(s.message, String(data.get('message') ?? ''));
     const text = lines.join('\n');
 

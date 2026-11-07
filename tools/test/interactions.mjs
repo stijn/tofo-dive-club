@@ -84,6 +84,13 @@ async function browser(width, height = 860) {
   check('empty name shows an error', await b.ev(`!document.getElementById('f-name-error').hidden && document.activeElement.id === 'f-name'`));
   await b.ev(`window.open = (u) => { window.__opened = u; }; document.getElementById('f-name').value = 'Isa'; document.querySelector('[data-join-form] button[value=whatsapp]').click(); 1`); await sleep(400);
   check('form opens WhatsApp with the message', await b.ev(`decodeURIComponent(window.__opened || '').includes('Isa')`));
+  check('preferred language defaults to the page language', (await b.ev(`document.getElementById('f-language').value`)) === 'en');
+  await b.ev(`(() => { const l = document.getElementById('f-language'); l.value = 'fr'; l.dispatchEvent(new Event('change', { bubbles: true })); document.querySelector('[data-join-form] button[value=whatsapp]').click(); return 1; })()`); await sleep(300);
+  check('message includes the preferred language', await b.ev(`decodeURIComponent(window.__opened).includes('Preferred language: Français')`));
+  await b.ev(`(() => { const l = document.getElementById('f-language'); l.value = 'other'; l.dispatchEvent(new Event('change', { bubbles: true })); return 1; })()`); await sleep(200);
+  check('"Another language" opens a text field', await b.ev(`!document.querySelector('[data-language-other]').hidden`));
+  await b.ev(`document.getElementById('f-language-other').value = 'Kiswahili'; document.querySelector('[data-join-form] button[value=whatsapp]').click(); 1`); await sleep(300);
+  check('and that language goes in the message', await b.ev(`decodeURIComponent(window.__opened).includes('Preferred language: Kiswahili')`));
 
   await b.ev(`document.body.focus(); for (const k of 'manta') document.dispatchEvent(new KeyboardEvent('keydown', { key: k, bubbles: true })); 1`); await sleep(200);
   check('typing "manta" releases mantas', (await b.ev(`document.querySelectorAll('.fx-manta').length`)) === 3);
