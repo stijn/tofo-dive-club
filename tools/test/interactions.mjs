@@ -147,6 +147,29 @@ async function browser(width, height = 860) {
   check('save data button reachable in the menu', await b.ev(`getComputedStyle(document.querySelector('[data-data-btn]')).visibility === 'visible'`));
   await b.ev(`document.querySelector('[data-menu-btn]').click(); 1`); await sleep(300);
   check('no horizontal scroll', await b.ev(`document.documentElement.scrollWidth <= innerWidth`));
+  // The whale shark and the humpback swim out past the right edge. Phones then widen the
+  // whole page to fit them, unless something clips them. Start both, step every animation
+  // on the page through its run, end included, and check the page stays phone-wide.
+  await b.ev(`scrollTo({ top: document.querySelector('#sites').offsetTop, behavior: 'instant' }); 1`);
+  const sharkSwam = await b.until(`document.querySelector('.shark-pass').classList.contains('is-swimming')`);
+  await b.ev(`scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }); 1`);
+  const whaleSwam = await b.until(`document.querySelector('.whale-pass').classList.contains('is-swimming')`);
+  const widest = await b.ev(`(async () => {
+    const frame = () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+    const anims = document.getAnimations();
+    let widest = 0;
+    for (const f of [0, 0.25, 0.5, 0.75, 0.9, 1]) {
+      for (const a of anims) {
+        const t = a.effect.getComputedTiming();
+        a.pause();
+        a.currentTime = f === 1 && Number.isFinite(t.endTime) ? t.endTime : t.duration * Math.min(f, 0.999);
+      }
+      await frame(); await frame();
+      widest = Math.max(widest, document.documentElement.scrollWidth, innerWidth);
+    }
+    return widest;
+  })()`);
+  check('swimming animals never make the page wider than the phone', sharkSwam && whaleSwam && widest <= 375, `widest ${widest}px`);
   check('no script errors', b.errors.length === 0, b.errors.join(' | '));
   b.close();
 }

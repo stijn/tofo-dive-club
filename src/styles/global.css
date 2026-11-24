@@ -487,6 +487,17 @@ ol {
 .section {
   position: relative;
   padding: clamp(80px, 11vw, 150px) 0;
+  /* The whale shark, the humpback and the calendar animals swim across the full width
+     and out the far side. Clip them at the section: phones ignore the clip on body and
+     widen the whole page to fit them, which leaves empty space on the right. */
+  overflow-x: clip;
+}
+/* Browsers without overflow-x: clip (Safari before 16) skip the two big swimmers. */
+@supports not (overflow-x: clip) {
+  .shark-pass,
+  .whale-pass {
+    display: none;
+  }
 }
 .deep {
   color: var(--on-deep);

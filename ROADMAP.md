@@ -18,6 +18,11 @@ Every change to the site is logged here, newest first. Add to it in the same com
 - Another language (French or German are the likeliest) once the join form's "preferred language" answers show demand.
 - Club photos: replace the masters in `src/assets/photos/` (same file names) and update the credits.
 
+## 0.6.1 · 2026-11-24
+
+- **Fixed: empty space on the right on phones.** The whale shark and the humpback swim out past the right edge. The clip on `<body>` that should hide them is ignored by phone browsers, which widened the whole page to fit them instead: from 375 to 665 px on Chrome for Android, so the page could be dragged sideways into empty space. Each section now clips its own swimmers (`overflow-x: clip`), so the page stays as wide as the phone. Browsers without `overflow-x: clip` (Safari before 16) skip those two animals.
+- **Tests**: `npm run test:ui` now starts both swimmers on a phone, steps every animation on the page through its run, and fails if the page ever gets wider than the screen. The old check only looked at page load, before anything swam.
+
 ## 0.6.0 · 2026-11-07
 
 No font files, a whale shark, a headline that matches its photo, a data saver that decides for itself, a smoother language switch, and small moments of delight. Measured like 0.5.0 (throttled slow 3G, first visit, data saver off), against the live 0.5.0:
