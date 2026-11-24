@@ -231,6 +231,11 @@ ol {
   backdrop-filter: blur(14px) saturate(140%);
   box-shadow: 0 1px 0 rgb(255 255 255 / 0.08);
 }
+/* The backdrop behind the open hamburger menu only exists below 1080px, where the
+   hamburger is (see the max-width: 1080px block). Desktop never shows it. */
+.menu-scrim {
+  display: none;
+}
 
 .header-bar {
   display: flex;
@@ -1659,7 +1664,7 @@ ol {
     max-height: calc(100svh - var(--header-h));
     padding: 0.5rem var(--gutter) 2rem;
     overflow-y: auto;
-    background: rgb(4 25 42 / 0.97);
+    background: rgb(4 25 42); /* solid, so no page text shows through between the links */
     opacity: 0;
     visibility: hidden;
     transform: translateY(-8px);
@@ -1670,6 +1675,27 @@ ol {
     visibility: visible;
     transform: none;
     transition: opacity 0.25s ease, transform 0.25s ease;
+    /* A soft shadow lifts the open menu off the page below it. */
+    box-shadow: 0 28px 48px -16px rgb(0 0 0 / 0.55);
+  }
+  /* A half-black backdrop behind the open menu, so the menu stands out from the page.
+     Tapping it closes the menu (Header.astro). It sits over the page, the gauge and the
+     buoy, under the header and its menu. No blur: that's slow on cheap phones. Wider
+     screens show the links in the header itself and never get this. */
+  .menu-scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 48;
+    background: rgb(0 0 0 / 0.5);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0s linear 0.25s;
+  }
+  .site-header.is-open ~ .menu-scrim {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.25s ease;
   }
   .nav ul {
     flex-direction: column;

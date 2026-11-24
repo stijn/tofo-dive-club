@@ -44,6 +44,7 @@ async function browser(width, height = 860) {
   const b = await browser(1280);
   await b.go('/');
   check('animations on by default', await b.ev(`document.documentElement.classList.contains('js-motion')`));
+  check('desktop has no menu backdrop, links stay in the header', await b.ev(`getComputedStyle(document.querySelector('[data-menu-scrim]')).display === 'none' && getComputedStyle(document.querySelector('[data-menu-btn]')).display === 'none' && getComputedStyle(document.querySelector('#site-nav')).visibility === 'visible'`));
 
   let r = await b.rect('[data-motion-btn]'); await b.move(r.x + r.w / 2, r.y + r.h / 2); await sleep(600);
   check('pause button has a tooltip', (await b.ev(`document.getElementById('tip').textContent`)) === 'Pause animations');
@@ -145,7 +146,12 @@ async function browser(width, height = 860) {
   check('menu button tooltip updates', (await b.ev(`document.querySelector('[data-menu-btn]').dataset.tip`)) === 'Fechar menu');
   check('pause button reachable in the menu', await b.ev(`getComputedStyle(document.querySelector('[data-motion-btn]')).visibility === 'visible'`));
   check('save data button reachable in the menu', await b.ev(`getComputedStyle(document.querySelector('[data-data-btn]')).visibility === 'visible'`));
-  await b.ev(`document.querySelector('[data-menu-btn]').click(); 1`); await sleep(300);
+  check('a half-black backdrop covers the page behind the menu', await b.ev(`(() => { const s = getComputedStyle(document.querySelector('[data-menu-scrim]')); return s.backgroundColor === 'rgba(0, 0, 0, 0.5)' && s.visibility === 'visible' && s.opacity === '1' && s.position === 'fixed'; })()`));
+  // A real tap on the first spot from the bottom where the backdrop is on top (below the menu).
+  const spot = await b.ev(`(() => { const s = document.querySelector('[data-menu-scrim]'); for (let y = innerHeight - 10; y > 0; y -= 10) if (document.elementFromPoint(innerWidth / 2, y) === s) return y; return null; })()`);
+  if (spot) { await b.click(187, spot); await sleep(400); }
+  check('tapping the backdrop closes the menu', !!spot && (await b.ev(`document.querySelector('[data-menu-btn]').getAttribute('aria-expanded') === 'false' && getComputedStyle(document.querySelector('[data-menu-scrim]')).visibility === 'hidden'`)), spot ? `tapped at y=${spot}` : 'no backdrop visible below the menu');
+  check('and focus goes back to the menu button', await b.ev(`document.activeElement === document.querySelector('[data-menu-btn]')`));
   check('no horizontal scroll', await b.ev(`document.documentElement.scrollWidth <= innerWidth`));
   // The whale shark and the humpback swim out past the right edge. Phones then widen the
   // whole page to fit them, unless something clips them. Start both, step every animation

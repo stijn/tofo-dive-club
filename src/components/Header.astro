@@ -82,6 +82,9 @@ const links = [
     </div>
   </div>
 </header>
+<!-- Darkens the page behind the open hamburger menu; tapping it closes the menu. It sits
+     outside the header so it can cover the whole page, with the header and menu on top. -->
+<div class="menu-scrim" aria-hidden="true" data-menu-scrim></div>
 
 <script>
   import { setMotion, motionOn } from '../scripts/motion-state';
@@ -110,6 +113,11 @@ const links = [
     };
     btn.addEventListener('click', () => setOpen(btn.getAttribute('aria-expanded') !== 'true'));
     header.querySelectorAll('.nav a').forEach((a) => a.addEventListener('click', () => setOpen(false)));
+    // Tapping the dimmed page closes the menu, and focus goes back to the menu button.
+    document.querySelector('[data-menu-scrim]')?.addEventListener('click', () => {
+      setOpen(false);
+      btn.focus({ preventScroll: true });
+    });
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && header.classList.contains('is-open')) {
         setOpen(false);

@@ -18,6 +18,11 @@ Every change to the site is logged here, newest first. Add to it in the same com
 - Another language (French or German are the likeliest) once the join form's "preferred language" answers show demand.
 - Club photos: replace the masters in `src/assets/photos/` (same file names) and update the credits.
 
+## 0.6.2 · 2026-11-24
+
+- **Backdrop behind the phone menu**: when the hamburger menu is open, a half-black backdrop covers the page, so the menu stands out from what's under it. Tapping the backdrop closes the menu and puts focus back on the menu button, like Escape does. It shows wherever the hamburger menu is (up to 1080 px wide, so tablets too); desktop keeps its links in the header and never gets it. No blur, which is slow on cheap phones. The menu panel is now fully solid, so page text no longer shows faintly between the links.
+- **Tests**: `npm run test:ui` checks the backdrop's colour, closes the menu with a real tap on it, checks where focus lands, and checks that desktop has no backdrop.
+
 ## 0.6.1 · 2026-11-24
 
 - **Fixed: empty space on the right on phones.** The whale shark and the humpback swim out past the right edge. The clip on `<body>` that should hide them is ignored by phone browsers, which widened the whole page to fit them instead: from 375 to 665 px on Chrome for Android, so the page could be dragged sideways into empty space. Each section now clips its own swimmers (`overflow-x: clip`), so the page stays as wide as the phone. Browsers without `overflow-x: clip` (Safari before 16) skip those two animals.

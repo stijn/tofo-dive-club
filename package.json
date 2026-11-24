@@ -1,7 +1,7 @@
 {
   "name": "tofo-dive-club",
   "type": "module",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "private": true,
   "description": "MVP website for a community dive club in Tofo, on Mozambique's Manta Coast. English and Portuguese, Gitonga in translation. Works on patchy mobile data.",
   "engines": {
